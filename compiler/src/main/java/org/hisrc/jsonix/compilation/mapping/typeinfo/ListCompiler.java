@@ -8,7 +8,7 @@ import org.hisrc.jscm.codemodel.expression.JSObjectLiteral;
 import org.hisrc.jsonix.compilation.mapping.IsLiteralEquals;
 import org.hisrc.jsonix.compilation.mapping.MappingCompiler;
 import org.hisrc.jsonix.naming.Naming;
-import org.jvnet.jaxb2_commons.xml.bind.model.MList;
+import org.jvnet.jaxb.xml.bind.model.MList;
 
 import com.sun.xml.xsom.XmlString;
 

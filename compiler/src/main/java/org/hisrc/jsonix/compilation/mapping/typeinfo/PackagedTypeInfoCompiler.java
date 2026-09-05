@@ -5,7 +5,7 @@ import org.hisrc.jscm.codemodel.JSCodeModel;
 import org.hisrc.jscm.codemodel.expression.JSAssignmentExpression;
 import org.hisrc.jsonix.compilation.mapping.MappingCompiler;
 import org.hisrc.jsonix.definition.Modules;
-import org.jvnet.jaxb2_commons.xml.bind.model.MPackagedTypeInfo;
+import org.jvnet.jaxb.xml.bind.model.MPackagedTypeInfo;
 
 import com.sun.xml.xsom.XmlString;
 

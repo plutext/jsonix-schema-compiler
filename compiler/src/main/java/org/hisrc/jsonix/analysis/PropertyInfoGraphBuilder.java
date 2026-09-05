@@ -3,22 +3,22 @@ package org.hisrc.jsonix.analysis;
 import javax.xml.namespace.QName;
 
 import org.apache.commons.lang3.Validate;
-import org.jvnet.jaxb2_commons.xml.bind.model.MAnyAttributePropertyInfo;
-import org.jvnet.jaxb2_commons.xml.bind.model.MAnyElementPropertyInfo;
-import org.jvnet.jaxb2_commons.xml.bind.model.MAttributePropertyInfo;
-import org.jvnet.jaxb2_commons.xml.bind.model.MClassInfo;
-import org.jvnet.jaxb2_commons.xml.bind.model.MElement;
-import org.jvnet.jaxb2_commons.xml.bind.model.MElementInfo;
-import org.jvnet.jaxb2_commons.xml.bind.model.MElementPropertyInfo;
-import org.jvnet.jaxb2_commons.xml.bind.model.MElementRefPropertyInfo;
-import org.jvnet.jaxb2_commons.xml.bind.model.MElementRefsPropertyInfo;
-import org.jvnet.jaxb2_commons.xml.bind.model.MElementTypeInfo;
-import org.jvnet.jaxb2_commons.xml.bind.model.MElementTypeRef;
-import org.jvnet.jaxb2_commons.xml.bind.model.MElementsPropertyInfo;
-import org.jvnet.jaxb2_commons.xml.bind.model.MModelInfo;
-import org.jvnet.jaxb2_commons.xml.bind.model.MPropertyInfoVisitor;
-import org.jvnet.jaxb2_commons.xml.bind.model.MTyped;
-import org.jvnet.jaxb2_commons.xml.bind.model.MValuePropertyInfo;
+import org.jvnet.jaxb.xml.bind.model.MAnyAttributePropertyInfo;
+import org.jvnet.jaxb.xml.bind.model.MAnyElementPropertyInfo;
+import org.jvnet.jaxb.xml.bind.model.MAttributePropertyInfo;
+import org.jvnet.jaxb.xml.bind.model.MClassInfo;
+import org.jvnet.jaxb.xml.bind.model.MElement;
+import org.jvnet.jaxb.xml.bind.model.MElementInfo;
+import org.jvnet.jaxb.xml.bind.model.MElementPropertyInfo;
+import org.jvnet.jaxb.xml.bind.model.MElementRefPropertyInfo;
+import org.jvnet.jaxb.xml.bind.model.MElementRefsPropertyInfo;
+import org.jvnet.jaxb.xml.bind.model.MElementTypeInfo;
+import org.jvnet.jaxb.xml.bind.model.MElementTypeRef;
+import org.jvnet.jaxb.xml.bind.model.MElementsPropertyInfo;
+import org.jvnet.jaxb.xml.bind.model.MModelInfo;
+import org.jvnet.jaxb.xml.bind.model.MPropertyInfoVisitor;
+import org.jvnet.jaxb.xml.bind.model.MTyped;
+import org.jvnet.jaxb.xml.bind.model.MValuePropertyInfo;
 
 public final class PropertyInfoGraphBuilder<T, C extends T> implements
 		MPropertyInfoVisitor<T, C, PropertyInfoVertex<T, C>> {

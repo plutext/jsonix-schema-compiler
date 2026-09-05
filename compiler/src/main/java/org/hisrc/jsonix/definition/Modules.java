@@ -9,7 +9,7 @@ import org.apache.commons.lang3.Validate;
 import org.hisrc.jsonix.configuration.exception.AmbiguousPackageMappingNameException;
 import org.hisrc.jsonix.configuration.exception.AmbiguousPackageSchemaIdException;
 import org.hisrc.jsonix.context.JsonixContext;
-import org.jvnet.jaxb2_commons.xml.bind.model.MModelInfo;
+import org.jvnet.jaxb.xml.bind.model.MModelInfo;
 import org.slf4j.Logger;
 
 public class Modules<T, C extends T> {

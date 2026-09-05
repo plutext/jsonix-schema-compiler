@@ -7,13 +7,13 @@ import org.hisrc.jsonix.context.JsonixContext;
 import org.jgrapht.DirectedGraph;
 import org.jgrapht.EdgeFactory;
 import org.jgrapht.graph.DefaultDirectedGraph;
-import org.jvnet.jaxb2_commons.xml.bind.model.MClassInfo;
-import org.jvnet.jaxb2_commons.xml.bind.model.MElementInfo;
-import org.jvnet.jaxb2_commons.xml.bind.model.MEnumLeafInfo;
-import org.jvnet.jaxb2_commons.xml.bind.model.MModelInfo;
-import org.jvnet.jaxb2_commons.xml.bind.model.MPackageInfo;
-import org.jvnet.jaxb2_commons.xml.bind.model.MPropertyInfo;
-import org.jvnet.jaxb2_commons.xml.bind.model.MTypeInfo;
+import org.jvnet.jaxb.xml.bind.model.MClassInfo;
+import org.jvnet.jaxb.xml.bind.model.MElementInfo;
+import org.jvnet.jaxb.xml.bind.model.MEnumLeafInfo;
+import org.jvnet.jaxb.xml.bind.model.MModelInfo;
+import org.jvnet.jaxb.xml.bind.model.MPackageInfo;
+import org.jvnet.jaxb.xml.bind.model.MPropertyInfo;
+import org.jvnet.jaxb.xml.bind.model.MTypeInfo;
 import org.slf4j.Logger;
 
 public class ModelInfoGraphBuilder<T, C extends T> {

@@ -7,8 +7,14 @@ Please refer to [Wiki](https://github.com/highsource/jsonix-schema-compiler/wiki
 ## Requirements
 
 - **Java 11 or newer** to run the compiler (CLI jar, Ant, Maven or NPM usage).
-- As an XJC plugin it requires JAXB 2.3.1 or newer (`javax.xml.bind` line, not Jakarta); with Maven use
-  `org.jvnet.jaxb2.maven2:maven-jaxb2-plugin` 0.14.0 or newer (0.15.3 is the last release).
+- **Jakarta XML Binding 4** (`jakarta.xml.bind`, JAXB 4.0.x). As an XJC plugin use it with
+  `org.jvnet.jaxb:jaxb-maven-plugin` 4.0.x or the JAXB 4 `xjc` Ant task. It does not work with the
+  legacy `javax.xml.bind` toolchain (`org.jvnet.jaxb2.maven2:maven-jaxb2-plugin`, JAXB 2.x); the last
+  release for that toolchain is 2.3.9.
+- **Binding files must use the Jakarta namespace**: `xmlns:jaxb="https://jakarta.ee/xml/ns/jaxb"` with
+  `version="3.0"`. JAXB 4 silently ignores customizations in the old `http://java.sun.com/xml/ns/jaxb`
+  namespace, which makes `jsonix:` customizations and package bindings disappear without an error.
+  The `xjc` extension namespace stays `http://java.sun.com/xml/ns/jaxb/xjc`.
 - Building from source: JDK 11+ and the bundled Maven wrapper (`./mvnw`).
 
 ## Using in command-line
@@ -82,8 +88,9 @@ See [Ant Usage](https://github.com/highsource/jsonix-schema-compiler/wiki/Ant-Us
 
 ```xml
 <plugin>
-	<groupId>org.jvnet.jaxb2.maven2</groupId>
-	<artifactId>maven-jaxb2-plugin</artifactId>
+	<groupId>org.jvnet.jaxb</groupId>
+	<artifactId>jaxb-maven-plugin</artifactId>
+	<version>4.0.16</version>
 	<configuration>
 		<extension>true</extension>
 		<args>

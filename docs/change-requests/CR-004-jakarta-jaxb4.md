@@ -1,6 +1,6 @@
 # CR-004: Jakarta XML Binding / JAXB 4 / jaxb-tools 4.x
 
-**Status:** Proposed (re-assessed 2026-09-06 after a full trial migration; previously "deferred")
+**Status:** Implemented (2026-09-06)
 **Depends on:** CR-001, CR-002, CR-003 (all implemented)
 **Recommended order:** next
 
@@ -145,3 +145,29 @@ throwaway consumer project using `jaxb-maven-plugin` 4.0.16 with `-Xjsonix` gene
 ## Effort
 
 Half a day, plus whatever the final `javax` release takes.
+
+## Implementation notes (2026-09-06)
+
+Implemented as planned in steps 1, 3 and 4 (1 and 3 in one change). No separate `javax` release
+was cut; that is the maintainer's call and would be made from commit `b47683a` or earlier.
+Additional touches beyond the trial:
+
+- Root pom property names renamed to match the artifacts (`jakarta.xml.bind-api.version`,
+  `jakarta.activation-api.version`, `jaxb-plugins.version`, `jaxb-maven-plugin.version`,
+  `commons-lang3.version`).
+- `samples/po/project-pom.xml`, `samples/po/project-build.xml` (Ant task class
+  `org.jvnet.jaxb.xjc.XJCTask`, jar name) and `samples/src/main/assembly/ant-src.xml` updated to the
+  new coordinates. The samples profile was not exercised.
+- README: Requirements section rewritten (Jakarta 4, binding namespace warning); Maven snippet uses
+  `org.jvnet.jaxb:jaxb-maven-plugin` 4.0.16.
+
+Verification:
+
+| Check | Result |
+|-------|--------|
+| `./mvnw clean install -Ptests -pl '!npm'` on JDK 17 | green: 29 + 4 unit tests, `filter`/`wps`/`zero`/`issues` |
+| same on JDK 21 | green |
+| `full` jar, `samples/po`, vs the JAXB 2.3.9 build (CR-003 state) | `.std.js`, `.cmp.js`, `.jsonschema` byte-identical |
+| `full` jar, OGC OWS 1.1.0 + XLink, vs the JAXB 2.3.9 build | all four files byte-identical |
+| JDK 17 vs 21 output | identical |
+| `full` jar contents | 126 `jakarta.xml.bind` classes, 47 `jakarta.activation`, 0 `javax.xml.bind`; 5.6 MB |

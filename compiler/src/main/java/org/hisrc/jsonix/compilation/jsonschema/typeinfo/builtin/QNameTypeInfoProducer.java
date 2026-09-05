@@ -4,14 +4,14 @@ import java.util.Iterator;
 
 import javax.json.JsonObjectBuilder;
 import javax.json.JsonValue;
-import javax.xml.bind.DatatypeConverter;
+import jakarta.xml.bind.DatatypeConverter;
 import javax.xml.namespace.NamespaceContext;
 import javax.xml.namespace.QName;
 
 import org.apache.commons.lang3.StringUtils;
 import org.hisrc.jsonix.compilation.jsonschema.JsonSchemaMappingCompiler;
 import org.hisrc.jsonix.compilation.jsonschema.typeinfo.BuiltinLeafInfoProducer;
-import org.jvnet.jaxb2_commons.xmlschema.XmlSchemaConstants;
+import org.jvnet.jaxb.xmlschema.XmlSchemaConstants;
 import com.sun.tools.rngdatatype.ValidationContext;
 
 import com.sun.xml.xsom.XmlString;

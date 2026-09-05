@@ -39,7 +39,7 @@
 		<delete dir="${basedir}/target/test-classes"/>
 	</target>
 	<target name="generate-sources">
-		<taskdef name="xjc" classname="org.jvnet.jaxb2_commons.xjc.XJC2Task">
+		<taskdef name="xjc" classname="org.jvnet.jaxb.xjc.XJCTask">
 			<!-- XJC2 Task classpath -->
 			<classpath>
 				<fileset dir="${basedir}/lib">
@@ -47,7 +47,7 @@
 					<include name="jaxb-runtime-*.jar"/>
 					<include name="jaxb-core-*.jar"/>
 					<include name="jaxb-xjc-*.jar"/>
-					<include name="jaxb2-basics-ant-*.jar"/>
+					<include name="jaxb-plugins-ant-*.jar"/>
 					<include name="slf4j-*.jar"/>
 					<include name="jcl-over-slf4j-*.jar"/>
 					<include name="slf4j-simple-*.jar"/>

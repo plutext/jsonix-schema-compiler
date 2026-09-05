@@ -1,6 +1,6 @@
-<jaxb:bindings version="1.0"
+<jaxb:bindings version="3.0"
 	xmlns:xs="http://www.w3.org/2001/XMLSchema" 
-	xmlns:jaxb="http://java.sun.com/xml/ns/jaxb" 
+	xmlns:jaxb="https://jakarta.ee/xml/ns/jaxb" 
 	xmlns:xjc="http://java.sun.com/xml/ns/jaxb/xjc" 
 	xmlns:jsonix="http://jsonix.highsource.org/customizations"
 	jaxb:extensionBindingPrefixes="xjc jsonix">

@@ -23,13 +23,13 @@
 				<include>org.hisrc.jsonix:jsonix-schema-compiler-plugin</include>
 				<include>org.glassfish.jaxb:jaxb-runtime</include>
 				<include>org.glassfish.jaxb:jaxb-xjc</include>
-				<include>org.jvnet.jaxb2_commons:jaxb2-basics-ant</include>
+				<include>org.jvnet.jaxb:jaxb-plugins-ant</include>
 			</includes-->
 			<excludes>
 				<exclude>org.hisrc.jsonix:jsonix-schema-compiler-full</exclude>
 				<!--include>org.glassfish.jaxb:jaxb-runtime</include>
 				<include>org.glassfish.jaxb:jaxb-xjc</include>
-				<include>org.jvnet.jaxb2_commons:jaxb2-basics-ant</include-->
+				<include>org.jvnet.jaxb:jaxb-plugins-ant</include-->
 			</excludes>
 		</dependencySet>
 	</dependencySets>

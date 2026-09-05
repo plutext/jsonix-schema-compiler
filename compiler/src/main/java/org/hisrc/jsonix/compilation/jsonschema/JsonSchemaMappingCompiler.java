@@ -14,12 +14,12 @@ import org.hisrc.jsonix.definition.Module;
 import org.hisrc.jsonix.definition.Modules;
 import org.hisrc.jsonix.jsonschema.JsonSchemaBuilder;
 import org.hisrc.jsonix.jsonschema.JsonSchemaConstants;
-import org.jvnet.jaxb2_commons.xml.bind.model.MClassInfo;
-import org.jvnet.jaxb2_commons.xml.bind.model.MElementInfo;
-import org.jvnet.jaxb2_commons.xml.bind.model.MEnumLeafInfo;
-import org.jvnet.jaxb2_commons.xml.bind.model.MTypeInfo;
-import org.jvnet.jaxb2_commons.xml.bind.model.origin.MElementInfoOrigin;
-import org.jvnet.jaxb2_commons.xml.bind.model.origin.MOriginated;
+import org.jvnet.jaxb.xml.bind.model.MClassInfo;
+import org.jvnet.jaxb.xml.bind.model.MElementInfo;
+import org.jvnet.jaxb.xml.bind.model.MEnumLeafInfo;
+import org.jvnet.jaxb.xml.bind.model.MTypeInfo;
+import org.jvnet.jaxb.xml.bind.model.origin.MElementInfoOrigin;
+import org.jvnet.jaxb.xml.bind.model.origin.MOriginated;
 
 public class JsonSchemaMappingCompiler<T, C extends T> {
 

@@ -56,13 +56,13 @@ import org.hisrc.jsonix.definition.Module;
 import org.hisrc.jsonix.definition.Modules;
 import org.hisrc.jsonix.definition.Output;
 import org.hisrc.jsonix.naming.Naming;
-import org.jvnet.jaxb2_commons.xml.bind.model.MClassInfo;
-import org.jvnet.jaxb2_commons.xml.bind.model.MElementInfo;
-import org.jvnet.jaxb2_commons.xml.bind.model.MEnumLeafInfo;
-import org.jvnet.jaxb2_commons.xml.bind.model.MPackageInfo;
-import org.jvnet.jaxb2_commons.xml.bind.model.MTypeInfo;
-import org.jvnet.jaxb2_commons.xml.bind.model.origin.MElementInfoOrigin;
-import org.jvnet.jaxb2_commons.xml.bind.model.origin.MOriginated;
+import org.jvnet.jaxb.xml.bind.model.MClassInfo;
+import org.jvnet.jaxb.xml.bind.model.MElementInfo;
+import org.jvnet.jaxb.xml.bind.model.MEnumLeafInfo;
+import org.jvnet.jaxb.xml.bind.model.MPackageInfo;
+import org.jvnet.jaxb.xml.bind.model.MTypeInfo;
+import org.jvnet.jaxb.xml.bind.model.origin.MElementInfoOrigin;
+import org.jvnet.jaxb.xml.bind.model.origin.MOriginated;
 
 public class MappingCompiler<T, C extends T> {
 	public static final String DEFAULT_SCOPED_NAME_DELIMITER = ".";

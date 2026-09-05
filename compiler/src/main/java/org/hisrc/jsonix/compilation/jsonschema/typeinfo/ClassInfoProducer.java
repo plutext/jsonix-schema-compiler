@@ -18,9 +18,9 @@ import org.hisrc.jsonix.jsonschema.JsonSchemaConstants;
 import org.hisrc.jsonix.naming.StandardNaming;
 import org.hisrc.jsonix.xml.xsom.ParticleMultiplicityCounter;
 import org.hisrc.xml.xsom.XSFunctionApplier;
-import org.jvnet.jaxb2_commons.xml.bind.model.MClassInfo;
-import org.jvnet.jaxb2_commons.xml.bind.model.MClassTypeInfo;
-import org.jvnet.jaxb2_commons.xml.bind.model.MPropertyInfo;
+import org.jvnet.jaxb.xml.bind.model.MClassInfo;
+import org.jvnet.jaxb.xml.bind.model.MClassTypeInfo;
+import org.jvnet.jaxb.xml.bind.model.MPropertyInfo;
 
 import com.sun.tools.xjc.model.Multiplicity;
 

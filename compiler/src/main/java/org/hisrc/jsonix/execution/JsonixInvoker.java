@@ -11,8 +11,8 @@ import org.hisrc.jsonix.configuration.OutputConfiguration;
 import org.hisrc.jsonix.context.DefaultJsonixContext;
 import org.hisrc.jsonix.definition.Modules;
 import org.hisrc.jsonix.settings.Settings;
-import org.jvnet.jaxb2_commons.xjc.model.concrete.XJCCMInfoFactory;
-import org.jvnet.jaxb2_commons.xml.bind.model.MModelInfo;
+import org.jvnet.jaxb.xjc.model.concrete.XJCCMInfoFactory;
+import org.jvnet.jaxb.xml.bind.model.MModelInfo;
 import org.slf4j.Logger;
 
 import com.sun.tools.xjc.model.Model;

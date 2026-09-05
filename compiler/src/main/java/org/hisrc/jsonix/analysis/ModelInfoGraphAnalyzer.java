@@ -13,13 +13,13 @@ import org.apache.commons.lang3.Validate;
 import org.hisrc.jsonix.context.JsonixContext;
 import org.jgrapht.DirectedGraph;
 import org.jgrapht.traverse.BreadthFirstIterator;
-import org.jvnet.jaxb2_commons.xml.bind.model.MClassInfo;
-import org.jvnet.jaxb2_commons.xml.bind.model.MElementInfo;
-import org.jvnet.jaxb2_commons.xml.bind.model.MEnumLeafInfo;
-import org.jvnet.jaxb2_commons.xml.bind.model.MModelInfo;
-import org.jvnet.jaxb2_commons.xml.bind.model.MPackageInfo;
-import org.jvnet.jaxb2_commons.xml.bind.model.MPropertyInfo;
-import org.jvnet.jaxb2_commons.xml.bind.model.MTypeInfo;
+import org.jvnet.jaxb.xml.bind.model.MClassInfo;
+import org.jvnet.jaxb.xml.bind.model.MElementInfo;
+import org.jvnet.jaxb.xml.bind.model.MEnumLeafInfo;
+import org.jvnet.jaxb.xml.bind.model.MModelInfo;
+import org.jvnet.jaxb.xml.bind.model.MPackageInfo;
+import org.jvnet.jaxb.xml.bind.model.MPropertyInfo;
+import org.jvnet.jaxb.xml.bind.model.MTypeInfo;
 
 public class ModelInfoGraphAnalyzer<T, C extends T> {
 

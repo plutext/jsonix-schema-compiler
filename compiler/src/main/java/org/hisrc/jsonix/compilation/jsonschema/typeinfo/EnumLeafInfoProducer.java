@@ -12,9 +12,9 @@ import org.hisrc.jsonix.compilation.jsonschema.JsonSchemaMappingCompiler;
 import org.hisrc.jsonix.compilation.jsonschema.JsonixJsonSchemaConstants;
 import org.hisrc.jsonix.jsonschema.JsonSchemaBuilder;
 import org.hisrc.jsonix.naming.StandardNaming;
-import org.jvnet.jaxb2_commons.xml.bind.model.MEnumConstantInfo;
-import org.jvnet.jaxb2_commons.xml.bind.model.MEnumLeafInfo;
-import org.jvnet.jaxb2_commons.xml.bind.model.MTypeInfo;
+import org.jvnet.jaxb.xml.bind.model.MEnumConstantInfo;
+import org.jvnet.jaxb.xml.bind.model.MEnumLeafInfo;
+import org.jvnet.jaxb.xml.bind.model.MTypeInfo;
 
 import com.sun.xml.xsom.XmlString;
 

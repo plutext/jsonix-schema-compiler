@@ -1,7 +1,7 @@
 package org.hisrc.jsonix.compilation.jsonschema;
 
 import org.hisrc.jsonix.jsonschema.JsonSchemaKeywords;
-import org.jvnet.jaxb2_commons.xmlschema.XmlSchemaConstants;
+import org.jvnet.jaxb.xmlschema.XmlSchemaConstants;
 
 public class XmlSchemaJsonSchemaConstants {
 

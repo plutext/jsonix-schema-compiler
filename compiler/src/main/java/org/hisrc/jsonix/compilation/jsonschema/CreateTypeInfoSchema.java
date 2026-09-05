@@ -8,10 +8,10 @@ import org.hisrc.jsonix.compilation.jsonschema.typeinfo.TypeInfoProducer;
 import org.hisrc.jsonix.jsonschema.JsonSchemaBuilder;
 import org.hisrc.jsonix.xml.xsom.CollectEnumerationValuesVisitor;
 import org.hisrc.xml.xsom.SchemaComponentAware;
-import org.jvnet.jaxb2_commons.xml.bind.model.MBuiltinLeafInfo;
-import org.jvnet.jaxb2_commons.xml.bind.model.MTypeInfo;
-import org.jvnet.jaxb2_commons.xml.bind.model.origin.MOriginated;
-import org.jvnet.jaxb2_commons.xml.bind.model.util.DefaultTypeInfoVisitor;
+import org.jvnet.jaxb.xml.bind.model.MBuiltinLeafInfo;
+import org.jvnet.jaxb.xml.bind.model.MTypeInfo;
+import org.jvnet.jaxb.xml.bind.model.origin.MOriginated;
+import org.jvnet.jaxb.xml.bind.model.util.DefaultTypeInfoVisitor;
 
 import com.sun.xml.xsom.XSComponent;
 import com.sun.xml.xsom.XmlString;

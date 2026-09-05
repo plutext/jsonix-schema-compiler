@@ -54,18 +54,18 @@ import org.hisrc.jsonix.compilation.mapping.typeinfo.builtin.StringTypeInfoCompi
 import org.hisrc.jsonix.compilation.mapping.typeinfo.builtin.XMLGregorianCalendarTypeInfoCompiler;
 import org.hisrc.jsonix.xml.xsom.CollectSimpleTypeNamesVisitor;
 import org.hisrc.xml.xsom.SchemaComponentAware;
-import org.jvnet.jaxb2_commons.xml.bind.model.MBuiltinLeafInfo;
-import org.jvnet.jaxb2_commons.xml.bind.model.MClassInfo;
-import org.jvnet.jaxb2_commons.xml.bind.model.MClassRef;
-import org.jvnet.jaxb2_commons.xml.bind.model.MEnumLeafInfo;
-import org.jvnet.jaxb2_commons.xml.bind.model.MID;
-import org.jvnet.jaxb2_commons.xml.bind.model.MIDREF;
-import org.jvnet.jaxb2_commons.xml.bind.model.MIDREFS;
-import org.jvnet.jaxb2_commons.xml.bind.model.MList;
-import org.jvnet.jaxb2_commons.xml.bind.model.MTypeInfoVisitor;
-import org.jvnet.jaxb2_commons.xml.bind.model.MWildcardTypeInfo;
-import org.jvnet.jaxb2_commons.xml.bind.model.origin.MOriginated;
-import org.jvnet.jaxb2_commons.xmlschema.XmlSchemaConstants;
+import org.jvnet.jaxb.xml.bind.model.MBuiltinLeafInfo;
+import org.jvnet.jaxb.xml.bind.model.MClassInfo;
+import org.jvnet.jaxb.xml.bind.model.MClassRef;
+import org.jvnet.jaxb.xml.bind.model.MEnumLeafInfo;
+import org.jvnet.jaxb.xml.bind.model.MID;
+import org.jvnet.jaxb.xml.bind.model.MIDREF;
+import org.jvnet.jaxb.xml.bind.model.MIDREFS;
+import org.jvnet.jaxb.xml.bind.model.MList;
+import org.jvnet.jaxb.xml.bind.model.MTypeInfoVisitor;
+import org.jvnet.jaxb.xml.bind.model.MWildcardTypeInfo;
+import org.jvnet.jaxb.xml.bind.model.origin.MOriginated;
+import org.jvnet.jaxb.xmlschema.XmlSchemaConstants;
 
 import com.sun.xml.xsom.XSComponent;
 

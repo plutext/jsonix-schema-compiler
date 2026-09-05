@@ -10,12 +10,12 @@ import org.hisrc.jscm.codemodel.expression.JSObjectLiteral;
 import org.hisrc.jsonix.compilation.mapping.typeinfo.TypeInfoCompiler;
 import org.hisrc.jsonix.xml.xsom.CollectEnumerationValuesVisitor;
 import org.hisrc.xml.xsom.SchemaComponentAware;
-import org.jvnet.jaxb2_commons.xml.bind.model.MBuiltinLeafInfo;
-import org.jvnet.jaxb2_commons.xml.bind.model.MDefaultValue;
-import org.jvnet.jaxb2_commons.xml.bind.model.MEnumLeafInfo;
-import org.jvnet.jaxb2_commons.xml.bind.model.MTypeInfo;
-import org.jvnet.jaxb2_commons.xml.bind.model.origin.MOriginated;
-import org.jvnet.jaxb2_commons.xml.bind.model.util.DefaultTypeInfoVisitor;
+import org.jvnet.jaxb.xml.bind.model.MBuiltinLeafInfo;
+import org.jvnet.jaxb.xml.bind.model.MDefaultValue;
+import org.jvnet.jaxb.xml.bind.model.MEnumLeafInfo;
+import org.jvnet.jaxb.xml.bind.model.MTypeInfo;
+import org.jvnet.jaxb.xml.bind.model.origin.MOriginated;
+import org.jvnet.jaxb.xml.bind.model.util.DefaultTypeInfoVisitor;
 import com.sun.tools.rngdatatype.ValidationContext;
 
 import com.sun.xml.xsom.XSComponent;

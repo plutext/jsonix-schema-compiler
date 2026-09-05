@@ -3,13 +3,13 @@ package org.hisrc.jsonix.tests.zero;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.jvnet.jaxb2.maven2.AbstractXJC2Mojo;
-import org.jvnet.jaxb2.maven2.test.RunXJC2Mojo;
+import org.jvnet.jaxb.maven.AbstractXJCMojo;
+import org.jvnet.jaxb.maven.test.RunXJCMojo;
 
-public class RunZeroPlugin extends RunXJC2Mojo {
+public class RunZeroPlugin extends RunXJCMojo {
 	
 	@Override
-	protected void configureMojo(AbstractXJC2Mojo mojo) {
+	protected void configureMojo(AbstractXJCMojo mojo) {
 		super.configureMojo(mojo);
 		mojo.setExtension(true);
 		mojo.setForceRegenerate(true);

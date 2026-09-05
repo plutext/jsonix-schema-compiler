@@ -2,15 +2,15 @@ package org.hisrc.jsonix.configuration;
 
 import java.text.MessageFormat;
 
-import javax.xml.bind.annotation.XmlAttribute;
-import javax.xml.bind.annotation.XmlRootElement;
-import javax.xml.bind.annotation.XmlType;
+import jakarta.xml.bind.annotation.XmlAttribute;
+import jakarta.xml.bind.annotation.XmlRootElement;
+import jakarta.xml.bind.annotation.XmlType;
 
 import org.apache.commons.lang3.Validate;
 import org.hisrc.jsonix.analysis.ModelInfoGraphAnalyzer;
 import org.hisrc.jsonix.context.JsonixContext;
-import org.jvnet.jaxb2_commons.xml.bind.model.MPackageInfo;
-import org.jvnet.jaxb2_commons.xml.bind.model.MTypeInfo;
+import org.jvnet.jaxb.xml.bind.model.MPackageInfo;
+import org.jvnet.jaxb.xml.bind.model.MTypeInfo;
 import org.slf4j.Logger;
 
 @XmlRootElement(name = TypeInfoConfiguration.LOCAL_ELEMENT_NAME)

@@ -1,6 +1,6 @@
 package org.hisrc.jsonix.compilation.mapping.typeinfo.builtin;
 
-import javax.xml.bind.annotation.adapters.NormalizedStringAdapter;
+import jakarta.xml.bind.annotation.adapters.NormalizedStringAdapter;
 import javax.xml.namespace.QName;
 
 import org.hisrc.jscm.codemodel.expression.JSAssignmentExpression;

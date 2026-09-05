@@ -23,8 +23,8 @@
 			<artifactId>jsonix-schema-compiler-plugin</artifactId>
 		</dependency>
 		<dependency>
-			<groupId>org.jvnet.jaxb2_commons</groupId>
-			<artifactId>jaxb2-basics-ant</artifactId>
+			<groupId>org.jvnet.jaxb</groupId>
+			<artifactId>jaxb-plugins-ant</artifactId>
 		</dependency>
 		<dependency>
 			<groupId>org.glassfish.jaxb</groupId>

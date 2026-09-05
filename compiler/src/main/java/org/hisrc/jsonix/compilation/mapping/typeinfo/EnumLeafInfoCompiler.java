@@ -8,11 +8,11 @@ import org.hisrc.jscm.codemodel.expression.JSObjectLiteral;
 import org.hisrc.jsonix.compilation.mapping.IsLiteralEquals;
 import org.hisrc.jsonix.compilation.mapping.MappingCompiler;
 import org.hisrc.jsonix.naming.Naming;
-import org.jvnet.jaxb2_commons.xml.bind.model.MEnumConstantInfo;
-import org.jvnet.jaxb2_commons.xml.bind.model.MEnumLeafInfo;
-import org.jvnet.jaxb2_commons.xml.bind.model.MTypeInfo;
-import org.jvnet.jaxb2_commons.xml.bind.model.origin.MEnumLeafInfoOrigin;
-import org.jvnet.jaxb2_commons.xml.bind.model.origin.MOriginated;
+import org.jvnet.jaxb.xml.bind.model.MEnumConstantInfo;
+import org.jvnet.jaxb.xml.bind.model.MEnumLeafInfo;
+import org.jvnet.jaxb.xml.bind.model.MTypeInfo;
+import org.jvnet.jaxb.xml.bind.model.origin.MEnumLeafInfoOrigin;
+import org.jvnet.jaxb.xml.bind.model.origin.MOriginated;
 
 import com.sun.xml.xsom.XmlString;
 

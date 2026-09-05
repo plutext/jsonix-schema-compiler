@@ -4,16 +4,16 @@ import java.text.MessageFormat;
 
 import javax.xml.namespace.QName;
 
-import org.jvnet.jaxb2_commons.xml.bind.model.MBuiltinLeafInfo;
-import org.jvnet.jaxb2_commons.xml.bind.model.MClassInfo;
-import org.jvnet.jaxb2_commons.xml.bind.model.MClassRef;
-import org.jvnet.jaxb2_commons.xml.bind.model.MEnumLeafInfo;
-import org.jvnet.jaxb2_commons.xml.bind.model.MID;
-import org.jvnet.jaxb2_commons.xml.bind.model.MIDREF;
-import org.jvnet.jaxb2_commons.xml.bind.model.MIDREFS;
-import org.jvnet.jaxb2_commons.xml.bind.model.MList;
-import org.jvnet.jaxb2_commons.xml.bind.model.MTypeInfoVisitor;
-import org.jvnet.jaxb2_commons.xml.bind.model.MWildcardTypeInfo;
+import org.jvnet.jaxb.xml.bind.model.MBuiltinLeafInfo;
+import org.jvnet.jaxb.xml.bind.model.MClassInfo;
+import org.jvnet.jaxb.xml.bind.model.MClassRef;
+import org.jvnet.jaxb.xml.bind.model.MEnumLeafInfo;
+import org.jvnet.jaxb.xml.bind.model.MID;
+import org.jvnet.jaxb.xml.bind.model.MIDREF;
+import org.jvnet.jaxb.xml.bind.model.MIDREFS;
+import org.jvnet.jaxb.xml.bind.model.MList;
+import org.jvnet.jaxb.xml.bind.model.MTypeInfoVisitor;
+import org.jvnet.jaxb.xml.bind.model.MWildcardTypeInfo;
 
 public class MTypeInfoToString<T, C extends T> implements MTypeInfoVisitor<T, C, String> {
 

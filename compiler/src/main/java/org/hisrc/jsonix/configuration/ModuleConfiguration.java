@@ -5,10 +5,10 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
-import javax.xml.bind.annotation.XmlAttribute;
-import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlRootElement;
-import javax.xml.bind.annotation.XmlType;
+import jakarta.xml.bind.annotation.XmlAttribute;
+import jakarta.xml.bind.annotation.XmlElement;
+import jakarta.xml.bind.annotation.XmlRootElement;
+import jakarta.xml.bind.annotation.XmlType;
 import javax.xml.namespace.QName;
 
 import org.hisrc.jsonix.analysis.ModelInfoGraphAnalyzer;
@@ -16,7 +16,7 @@ import org.hisrc.jsonix.definition.JsonSchema;
 import org.hisrc.jsonix.definition.Mapping;
 import org.hisrc.jsonix.definition.Module;
 import org.hisrc.jsonix.definition.Output;
-import org.jvnet.jaxb2_commons.xml.bind.model.MModelInfo;
+import org.jvnet.jaxb.xml.bind.model.MModelInfo;
 
 @XmlRootElement(name = ModuleConfiguration.LOCAL_ELEMENT_NAME)
 @XmlType(propOrder = {})

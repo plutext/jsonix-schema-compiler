@@ -1,8 +1,8 @@
 package org.hisrc.jsonix.compilation.jsonschema.typeinfo.builtin;
 
-import javax.xml.bind.DatatypeConverter;
+import jakarta.xml.bind.DatatypeConverter;
 
-import org.jvnet.jaxb2_commons.xmlschema.XmlSchemaConstants;
+import org.jvnet.jaxb.xmlschema.XmlSchemaConstants;
 
 public class HexBinaryTypeInfoProducer<T, C extends T, O> extends BinaryTypeInfoProducer<T, C, O> {
 

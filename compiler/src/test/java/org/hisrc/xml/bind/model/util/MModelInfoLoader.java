@@ -35,8 +35,8 @@ package org.hisrc.xml.bind.model.util;
 
 import java.io.File;
 
-import org.jvnet.jaxb2_commons.xjc.model.concrete.XJCCMInfoFactory;
-import org.jvnet.jaxb2_commons.xml.bind.model.MModelInfo;
+import org.jvnet.jaxb.xjc.model.concrete.XJCCMInfoFactory;
+import org.jvnet.jaxb.xml.bind.model.MModelInfo;
 
 import com.sun.codemodel.JCodeModel;
 import com.sun.tools.xjc.ConsoleErrorReporter;

@@ -39,13 +39,13 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import javax.xml.bind.JAXBContext;
-import javax.xml.bind.JAXBException;
+import jakarta.xml.bind.JAXBContext;
+import jakarta.xml.bind.JAXBException;
 
 import org.apache.commons.lang3.Validate;
 import org.hisrc.jsonix.configuration.exception.ConfigurationUnmarshallingException;
 import org.hisrc.jsonix.context.JsonixContext;
-import org.jvnet.jaxb2_commons.util.CustomizationUtils;
+import org.jvnet.jaxb.util.CustomizationUtils;
 import org.slf4j.Logger;
 
 import com.sun.tools.xjc.model.CPluginCustomization;

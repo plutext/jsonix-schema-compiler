@@ -27,14 +27,14 @@ import org.hisrc.jsonix.analysis.PropertyInfoVertex;
 import org.hisrc.jsonix.analysis.TypeInfoVertex;
 import org.hisrc.jsonix.context.JsonixContext;
 import org.jgrapht.DirectedGraph;
-import org.jvnet.jaxb2_commons.xml.bind.model.MClassInfo;
-import org.jvnet.jaxb2_commons.xml.bind.model.MElementInfo;
-import org.jvnet.jaxb2_commons.xml.bind.model.MEnumLeafInfo;
-import org.jvnet.jaxb2_commons.xml.bind.model.MPackageInfo;
-import org.jvnet.jaxb2_commons.xml.bind.model.MPropertyInfo;
-import org.jvnet.jaxb2_commons.xml.bind.model.MTypeInfo;
-import org.jvnet.jaxb2_commons.xml.bind.model.MTypeInfoVisitor;
-import org.jvnet.jaxb2_commons.xml.bind.model.util.DefaultTypeInfoVisitor;
+import org.jvnet.jaxb.xml.bind.model.MClassInfo;
+import org.jvnet.jaxb.xml.bind.model.MElementInfo;
+import org.jvnet.jaxb.xml.bind.model.MEnumLeafInfo;
+import org.jvnet.jaxb.xml.bind.model.MPackageInfo;
+import org.jvnet.jaxb.xml.bind.model.MPropertyInfo;
+import org.jvnet.jaxb.xml.bind.model.MTypeInfo;
+import org.jvnet.jaxb.xml.bind.model.MTypeInfoVisitor;
+import org.jvnet.jaxb.xml.bind.model.util.DefaultTypeInfoVisitor;
 import org.slf4j.Logger;
 
 public class Mapping<T, C extends T> {

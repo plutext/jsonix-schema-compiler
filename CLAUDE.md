@@ -8,8 +8,10 @@ An XJC (JAXB schema compiler) plugin that generates [Jsonix](https://github.com/
 
 ## Toolchain: JDK 11 or newer
 
-The build emits Java 11 bytecode (`maven.compiler.release` 11) and uses JAXB 2.3.9 (`javax.xml.bind`
-line; `jaxb-api` and `javax.activation` are declared explicitly because they left the JDK in 11).
+The build emits Java 11 bytecode (`maven.compiler.release` 11) and uses Jakarta XML Binding 4 (JAXB
+4.0.9, `jakarta.xml.bind`) with the jaxb-tools 4.0.16 family (`org.jvnet.jaxb:jaxb-plugins-*`,
+`jaxb-maven-plugin`). Binding files (`.xsd` annotations, `.xjb`) must use
+`https://jakarta.ee/xml/ns/jaxb` version 3.0; the `xjc` namespace stays `http://java.sun.com/xml/ns/jaxb/xjc`.
 `maven-enforcer-plugin` rejects JDK 8 at `validate`. Any of the installed JDKs 17 or 21 work:
 
 ```
@@ -62,11 +64,11 @@ Migration proposals (Java 11, JAXB 2.3, deterministic output, Jakarta) live in `
 
 ## Module layout
 
-- `compiler/` — all the logic. `JsonixPlugin` is registered as an XJC plugin via `META-INF/services/com.sun.tools.xjc.Plugin`. JAXB/XJC are `provided` scope here.
+- `compiler/` — all the logic. `JsonixPlugin` is registered as an XJC plugin via `META-INF/services/com.sun.tools.xjc.Plugin`. JAXB/XJC are `provided` scope here, as are the Jakarta binding and activation APIs.
 - `plugin/` — shaded jar of `compiler` (for the Ant/xjc classpath). Contains only a `Dummy` class.
-- `full/` — shaded executable jar bundling XJC, the JAXB runtime, `jaxb-api`, `javax.activation` and slf4j-simple. Adds `JsonixMain` (CLI entry point) and the `TargetDirectory*Writer` classes that write files to disk.
+- `full/` — shaded executable jar bundling XJC, the JAXB 4 runtime, the Jakarta APIs and slf4j-simple. Adds `JsonixMain` (CLI entry point) and the `TargetDirectory*Writer` classes that write files to disk.
 - `npm/` — wraps the `full` jar as `lib/jsonix-schema-compiler-full.jar`. `npm/package.json` is *generated* by resource filtering from `npm/src/main/npm/package.json`; edit the latter.
-- `tests/` (profile `tests`) — integration tests driven by `maven-jaxb2-plugin` 0.15.3: `zero`, `filter`, `wps`, and `issues` (GitHub issue regressions). `tests/zero` uses the 2010-era `legato-testing` JsUnit runner and needs `--add-opens java.base/java.net` (set in its surefire config).
+- `tests/` (profile `tests`) — integration tests driven by `org.jvnet.jaxb:jaxb-maven-plugin` 4.0.16: `zero`, `filter`, `wps`, and `issues` (GitHub issue regressions). `tests/zero` uses the 2010-era `legato-testing` JsUnit runner and needs `--add-opens java.base/java.net` (set in its surefire config).
 - `samples/po` (profile `samples`), `dist/` (profile `dist`), `demos/po-npm` (not built by Maven).
 
 ## Compilation pipeline (compiler module)
@@ -75,7 +77,7 @@ Both entry points (`JsonixPlugin.run` inside XJC, `JsonixMain` standalone) end u
 
 1. **Settings** (`settings.Settings`, args4j). Every option has a plain form and an `-Xjsonix-` alias (`-compact` / `-Xjsonix-compact`, `-logLevel`, `-defaultNaming`, `-generateJsonSchema`, `-d`). `args4j.PartialCmdLineParser` lets the plugin consume only its own options from the XJC arg list.
 2. **Configuration** (`configuration.*`). `ModulesConfigurationUnmarshaller` pulls `jsonix:*` binding customizations (namespace `http://jsonix.highsource.org/customizations`) out of the XJC `Model` and unmarshals them with JAXB into `ModulesConfiguration` / `ModuleConfiguration` / `MappingConfiguration` / `OutputConfiguration` / `JsonSchemaConfiguration` (+ includes/excludes). `jsonix:packageMapping` is deprecated and converted to a mapping. Defaults are applied when no customization exists (one output named `${module.name}.js`, and `${module.name}.jsonschema` if JSON Schema generation is on).
-3. **Model** — XJC's `Model` is converted to jaxb2-basics' `MModelInfo` via `XJCCMInfoFactory`. Everything downstream is generic over `<T, C extends T>` (`NType`/`NClass` in practice) and works only with `MModelInfo`, never XJC classes.
+3. **Model** — XJC's `Model` is converted to jaxb-plugins' (formerly jaxb2-basics) `MModelInfo` via `XJCCMInfoFactory`. Everything downstream is generic over `<T, C extends T>` (`NType`/`NClass` in practice) and works only with `MModelInfo`, never XJC classes.
 4. **Analysis** (`analysis.*`). `ModelInfoGraphAnalyzer` builds a JGraphT dependency graph over package/type/property/element vertices. `ModulesConfiguration.build` uses it to resolve includes/excludes and inter-mapping dependencies, producing the immutable `definition.*` objects (`Modules` → `Module` → `Mapping`, plus `Output` and `JsonSchema`). `Modules` enforces that a package is mapped under one mapping name and one schema id.
 5. **Mapping compilation** (`compilation.mapping.*`). `ModulesCompiler` → `ModuleCompiler` (emits the UMD-style module wrapper: AMD `define`, `module.exports`, or globals) → `MappingCompiler` → `typeinfo.*Compiler` classes, all building JS via `org.hisrc.jscm` js-codemodel. One `JSProgram` per (module, output) is handed to a `ProgramWriter` (`CodeModelProgramWriter` writes into XJC's `JCodeModel` as a resource; `TargetDirectoryProgramWriter` in `full` writes files).
 6. **JSON Schema generation** (`compilation.jsonschema.*`), mirroring step 5: `JsonSchemaModulesGenerator` → `JsonSchemaModuleCompiler` → `JsonSchemaMappingCompiler` → `typeinfo.*Producer`, building `javax.json` structures via `jsonschema.JsonSchemaBuilder` and handing them to a `JsonStructureWriter`.

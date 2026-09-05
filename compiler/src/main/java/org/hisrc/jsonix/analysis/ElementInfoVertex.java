@@ -5,9 +5,9 @@ import java.text.MessageFormat;
 import javax.xml.namespace.QName;
 
 import org.apache.commons.lang3.Validate;
-import org.jvnet.jaxb2_commons.xml.bind.model.MClassInfo;
-import org.jvnet.jaxb2_commons.xml.bind.model.MElementInfo;
-import org.jvnet.jaxb2_commons.xml.bind.model.MPackageInfo;
+import org.jvnet.jaxb.xml.bind.model.MClassInfo;
+import org.jvnet.jaxb.xml.bind.model.MElementInfo;
+import org.jvnet.jaxb.xml.bind.model.MPackageInfo;
 
 public class ElementInfoVertex<T, C extends T> extends InfoVertex<T,C> {
 

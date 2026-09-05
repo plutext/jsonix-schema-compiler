@@ -3,9 +3,9 @@ package org.hisrc.jsonix.analysis;
 import java.text.MessageFormat;
 
 import org.apache.commons.lang3.Validate;
-import org.jvnet.jaxb2_commons.xml.bind.model.MClassInfo;
-import org.jvnet.jaxb2_commons.xml.bind.model.MPackageInfo;
-import org.jvnet.jaxb2_commons.xml.bind.model.MPropertyInfo;
+import org.jvnet.jaxb.xml.bind.model.MClassInfo;
+import org.jvnet.jaxb.xml.bind.model.MPackageInfo;
+import org.jvnet.jaxb.xml.bind.model.MPropertyInfo;
 
 public class PropertyInfoVertex<T, C extends T> extends InfoVertex<T,C> {
 

@@ -1,6 +1,6 @@
 package org.hisrc.jsonix.analysis;
 
-import org.jvnet.jaxb2_commons.xml.bind.model.MPackageInfo;
+import org.jvnet.jaxb.xml.bind.model.MPackageInfo;
 
 public abstract class InfoVertex<T, C extends T> {
 

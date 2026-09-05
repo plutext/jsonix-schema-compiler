@@ -10,8 +10,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import javax.xml.bind.annotation.XmlRootElement;
-import javax.xml.bind.annotation.XmlType;
+import jakarta.xml.bind.annotation.XmlRootElement;
+import jakarta.xml.bind.annotation.XmlType;
 import javax.xml.namespace.QName;
 
 import org.apache.commons.lang3.StringUtils;
@@ -30,8 +30,8 @@ import org.jgrapht.EdgeFactory;
 import org.jgrapht.alg.StrongConnectivityInspector;
 import org.jgrapht.graph.DefaultDirectedGraph;
 import org.jgrapht.traverse.TopologicalOrderIterator;
-import org.jvnet.jaxb2_commons.xml.bind.model.MModelInfo;
-import org.jvnet.jaxb2_commons.xml.bind.model.MPackageInfo;
+import org.jvnet.jaxb.xml.bind.model.MModelInfo;
+import org.jvnet.jaxb.xml.bind.model.MPackageInfo;
 import org.slf4j.Logger;
 
 @XmlRootElement(name = ModulesConfiguration.LOCAL_ELEMENT_NAME)

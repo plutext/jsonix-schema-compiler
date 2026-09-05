@@ -6,9 +6,9 @@ import org.hisrc.xml.xsom.XSFunctionApplier;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
-import org.jvnet.jaxb2_commons.xml.bind.model.MClassInfo;
-import org.jvnet.jaxb2_commons.xml.bind.model.MModelInfo;
-import org.jvnet.jaxb2_commons.xml.bind.model.MPropertyInfo;
+import org.jvnet.jaxb.xml.bind.model.MClassInfo;
+import org.jvnet.jaxb.xml.bind.model.MModelInfo;
+import org.jvnet.jaxb.xml.bind.model.MPropertyInfo;
 
 import com.sun.tools.xjc.model.Multiplicity;
 import com.sun.tools.xjc.model.nav.NClass;

@@ -3,7 +3,7 @@ package org.hisrc.jsonix.compilation.mapping.typeinfo;
 import org.apache.commons.lang3.Validate;
 import org.hisrc.jscm.codemodel.expression.JSObjectLiteral;
 import org.hisrc.jsonix.compilation.mapping.MappingCompiler;
-import org.jvnet.jaxb2_commons.xml.bind.model.MClassRef;
+import org.jvnet.jaxb.xml.bind.model.MClassRef;
 
 public class ClassRefCompiler<T, C extends T> extends PackagedTypeInfoCompiler<T, C> {
 

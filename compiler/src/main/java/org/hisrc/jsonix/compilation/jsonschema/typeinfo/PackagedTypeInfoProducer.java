@@ -7,7 +7,7 @@ import org.hisrc.jsonix.compilation.jsonschema.JsonSchemaMappingCompiler;
 import org.hisrc.jsonix.compilation.mapping.MappingCompiler;
 import org.hisrc.jsonix.jsonschema.JsonSchemaBuilder;
 import org.hisrc.jsonix.jsonschema.JsonSchemaKeywords;
-import org.jvnet.jaxb2_commons.xml.bind.model.MPackagedTypeInfo;
+import org.jvnet.jaxb.xml.bind.model.MPackagedTypeInfo;
 
 import com.sun.xml.xsom.XmlString;
 

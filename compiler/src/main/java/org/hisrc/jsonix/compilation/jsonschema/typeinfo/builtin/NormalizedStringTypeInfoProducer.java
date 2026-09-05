@@ -2,7 +2,7 @@ package org.hisrc.jsonix.compilation.jsonschema.typeinfo.builtin;
 
 import javax.json.JsonArrayBuilder;
 import javax.json.JsonValue;
-import javax.xml.bind.annotation.adapters.NormalizedStringAdapter;
+import jakarta.xml.bind.annotation.adapters.NormalizedStringAdapter;
 import javax.xml.namespace.QName;
 
 import org.hisrc.jsonix.compilation.jsonschema.JsonSchemaMappingCompiler;
