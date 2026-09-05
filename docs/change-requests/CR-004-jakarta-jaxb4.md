@@ -1,37 +1,147 @@
 # CR-004: Jakarta XML Binding / JAXB 4 / jaxb-tools 4.x
 
-**Status:** Deferred (not recommended until CR-001 to CR-003 are done and there is a concrete consumer need)
-**Depends on:** CR-002
+**Status:** Proposed (re-assessed 2026-09-06 after a full trial migration; previously "deferred")
+**Depends on:** CR-001, CR-002, CR-003 (all implemented)
+**Recommended order:** next
 
 ## Summary
 
-CR-002 stays on the `javax.xml.bind` line (JAXB 2.3.9), which is end-of-life but works on any JDK.
-The ecosystem has moved to `jakarta.xml.bind` (JAXB 3.x/4.x) and the successor of
-`maven-jaxb2-plugin`, `org.jvnet.jaxb:jaxb-maven-plugin` 4.0.x with `org.jvnet.jaxb:jaxb-basics`
-4.0.x. This CR records what a move would involve so it can be costed later.
+Move from the end-of-life `javax.xml.bind` line (JAXB 2.3.9, `maven-jaxb2-plugin` 0.15.3) to
+Jakarta XML Binding 4 (JAXB 4.0.9) and its tooling successor `org.jvnet.jaxb:jaxb-tools` 4.0.16
+(`jaxb-maven-plugin`, `jaxb-plugins-*`). A complete trial in a scratch copy shows this is a
+**mechanical** change: coordinate renames, package renames, one library substitution, and a
+two-line workaround for a Jakarta bug. The full unit and integration suite passes, and the CLI
+output is byte-identical to the JAXB 2.3.9 build.
 
-## Why not now
+The original estimate of two to four days and the "deferred" status were wrong. The trial took
+about two hours including diagnosis.
 
-- 21 source files in `compiler` import `javax.xml.bind.*`; 58 distinct `org.jvnet.jaxb2_commons.*`
-  imports (jaxb2-basics 0.11 API); 32 files in `compiler`/`full` use `com.sun.tools.xjc`,
-  `com.sun.xml.xsom` or `com.sun.codemodel`. All of these change package or artifact coordinates
-  under Jakarta/jaxb-tools 4 (`org.jvnet.jaxb.*`, `org.glassfish.jaxb:jaxb-xjc:4.x`, codemodel
-  moved to `org.glassfish.jaxb:codemodel:4.x`).
-- The XJC plugin SPI (`com.sun.tools.xjc.Plugin`) is the same shape in 4.x, but the surrounding
-  model classes (`CPluginCustomization`, `Model`, `NType`/`NClass`) must be re-verified.
-- The `full` jar would then require JDK 11+ regardless of `release` level (JAXB 4 is compiled for 11).
-- Consumers using Ant/`xjc` from an older JAXB would be cut off entirely, whereas after CR-002 they
-  keep working with JAXB 2.3.1+.
+## Why do it
 
-## Outline of the work
+- `org.jvnet.jaxb2.maven2:maven-jaxb2-plugin` 0.15.3 (2022) is the last release of that line. Every
+  actively maintained Maven build that runs XJC today uses `org.jvnet.jaxb:jaxb-maven-plugin` 4.x
+  with Jakarta JAXB, and an XJC plugin compiled against `javax.xml.bind` cannot be loaded there.
+- JAXB 2.3.x itself is in maintenance only. JDK 11+ users get Jakarta JAXB from every framework
+  (Jakarta EE 10, Spring Boot 3, docx4j 11).
+- The trial proves the whole `jaxb2-basics` model API this project is built on
+  (`MModelInfo`, `XJCCMInfoFactory`, `CustomizationUtils`, the visitors and origins) survives
+  unchanged in `jaxb-plugins-runtime`/`jaxb-plugins-tools` 4.0.16 under the package `org.jvnet.jaxb`,
+  compiled for Java 11.
 
-1. Bump `jaxb.version` to 4.0.x, `jaxb2-basics` → `org.jvnet.jaxb:jaxb-basics` 4.0.x, plugin →
-   `org.jvnet.jaxb:jaxb-maven-plugin` 4.0.x, `javax.json` → `jakarta.json` 2.x.
-2. Mechanical package renames: `javax.xml.bind` → `jakarta.xml.bind`, `org.jvnet.jaxb2_commons` →
-   `org.jvnet.jaxb`.
-3. Re-run the whole suite; expect model-API drift in `analysis/*` and `xml/xsom/*`.
-4. Publish under a new `groupId`/npm name (this fork cannot release as `org.hisrc.jsonix`).
+## Trial results (JDK 17)
+
+| Check | Result |
+|-------|--------|
+| `compiler` compiles after renames | yes, zero code edits needed beyond those listed below |
+| `./mvnw clean install -Ptests -pl '!npm'` | green: 29 + 4 unit tests, `filter`, `wps`, `zero`, `issues` |
+| `full` jar on JDK 17 and 21 against `samples/po` | all three files produced |
+| Output vs the JAXB 2.3.9 build (same jar inputs) | `.std.js`, `.cmp.js`, `.jsonschema` byte-identical |
+| `full` jar contents | 126 `jakarta.xml.bind` classes, 0 `javax.xml.bind`; 5.6 MB (was 7.5 MB) |
+
+## What actually changes (from the trial diff: 110 files)
+
+### Coordinates (root `pom.xml` and 8 module poms)
+
+| Old | New |
+|-----|-----|
+| `org.glassfish.jaxb:*` 2.3.9 | same artifacts, **4.0.9** |
+| `javax.xml.bind:jaxb-api` 2.3.1 | `jakarta.xml.bind:jakarta.xml.bind-api` **4.0.2** |
+| `com.sun.activation:javax.activation` 1.2.0 | `jakarta.activation:jakarta.activation-api` **2.1.3** (runtime impl `angus-activation` arrives transitively) |
+| `org.jvnet.jaxb2_commons:jaxb2-basics-runtime/-tools/-ant/jaxb2-basics` 0.11.0 | `org.jvnet.jaxb:jaxb-plugins-runtime/-tools/-ant/jaxb-plugins` **4.0.16** |
+| `org.jvnet.jaxb2.maven2:maven-jaxb2-plugin` 0.15.3 | `org.jvnet.jaxb:jaxb-maven-plugin` **4.0.16** |
+| `org.jvnet.jaxb2.maven2:maven-jaxb2-plugin-testing` | `org.jvnet.jaxb:jaxb-maven-plugin-testing` 4.0.16 |
+| (transitive) | `org.apache.commons:commons-lang3` 3.20.0, **declared explicitly** |
+
+`commons-lang3` is used directly by 30+ classes (`Validate`, `StringUtils`) but was never declared;
+it arrived via `jaxb2-basics-tools`. `jaxb-plugins-tools` no longer brings it. Declaring it is
+correct regardless of this CR and could be done today.
+
+### Packages (73 Java files, imports only)
+
+- `javax.xml.bind` → `jakarta.xml.bind`
+- `org.jvnet.jaxb2_commons` → `org.jvnet.jaxb`
+
+Two of the 73 files show large diffs in the trial only because the rewrite normalised their CRLF
+line endings; ignoring CR they are import-only. `com.sun.tools.xjc`, `com.sun.codemodel`,
+`com.sun.xml.xsom` and `com.sun.tools.rngdatatype` are unchanged in JAXB 4.
+
+### Real code changes (2 files, 2 lines each)
+
+`Base64BinaryTypeInfoCompiler` and `Base64BinaryTypeInfoProducer` call
+`DatatypeConverter.parseBase64Binary`. The Jakarta 4.0.2 implementation throws
+`IllegalArgumentException: base64 text invalid` for valid one-byte inputs such as `QQ==` (verified in
+isolation; the javax 2.3.1 implementation accepts them). Replace with
+`java.util.Base64.getMimeDecoder().decode(item)`. This also removes a JAXB-implementation dependency
+from the compiler and can be done today.
+
+### Test helper (1 file)
+
+`tests/zero/.../RunZeroPlugin` extends `org.jvnet.jaxb2.maven2.test.RunXJC2Mojo`; in 4.x this is
+`org.jvnet.jaxb.maven.test.RunXJCMojo` with `configureMojo(AbstractXJCMojo)`. Four-line change.
+
+### Binding files (28 `.xsd`/`.xjb` in `compiler`, `full`, `tests`, `samples`)
+
+JAXB 4's XJC **silently ignores** customizations in the legacy namespace
+`http://java.sun.com/xml/ns/jaxb`. In the trial this made every `jaxb:schemaBindings`/`jaxb:package`
+disappear, so generated classes landed in package `generated` and tests failed with
+`getClassInfo("test.E01")` returning null. All binding files must move to
+`xmlns:jaxb="https://jakarta.ee/xml/ns/jaxb"` with `jaxb:version="3.0"` / `<jaxb:bindings version="3.0">`.
+The vendor-extension namespace `http://java.sun.com/xml/ns/jaxb/xjc` **stays as is** (JAXB 4 rejects
+a `jakarta.ee` form of it with "Unsupported binding namespace"). The `jsonix:` customization
+namespace is ours and does not change.
+
+This is the one item with a **user-facing** consequence: consumers' `.xjb` files need the same
+namespace change. Anyone already on `jaxb-maven-plugin` 4.x has done it; anyone still on
+`maven-jaxb2-plugin` 0.15.x cannot use the new release at all (see "Consumers" below).
+
+### Not changed
+
+- `javax.json` / `org.glassfish:javax.json` 1.0.4: unrelated to JAXB, works on Java 11+. Could move to
+  `jakarta.json` separately; not needed.
+- `jgrapht-core` 0.9.0, `js-codemodel` 1.1, `args4j` 2.0.29, `slf4j` 1.7.7: untouched.
+- `maven.compiler.release` stays 11 (all 4.x artifacts involved are Java 11 class files).
+
+## Consumers
+
+| Consumer | Before this CR | After this CR |
+|----------|----------------|---------------|
+| CLI jar (`full`, npm) | JDK 11+ | JDK 11+, unchanged usage; bindings must use the Jakarta namespace |
+| Maven, `org.jvnet.jaxb:jaxb-maven-plugin` 4.x | not possible | supported (this is the point of the CR) |
+| Maven, `org.jvnet.jaxb2.maven2:maven-jaxb2-plugin` 0.14+ | supported | **no longer possible** |
+| Ant `xjc` task from JAXB 2.3.x | supported | **no longer possible**; JAXB 4 `xjc` task works |
+
+If both audiences matter, the alternative is a second Maven module (`compiler-javax`, built from the
+same sources with the reverse package rewrite at build time). Not recommended: it doubles the test
+matrix for a line that is already end-of-life. Cut a final `javax` release from the current branch
+first and point old-toolchain users at it.
+
+## Plan
+
+1. Pre-work on the current line (no behaviour change, could ship before this CR):
+   declare `commons-lang3`; switch the two base64 decoders to `java.util.Base64`.
+2. Tag and release the last `javax` version.
+3. Apply the coordinate table above; run the two package renames over `compiler`, `full`, `tests`;
+   port `RunZeroPlugin`; rewrite the 28 binding files (namespace + version only).
+4. README: Requirements section becomes "JDK 11+, Jakarta XML Binding 4 / `jaxb-maven-plugin`
+   4.0.x; bindings use `https://jakarta.ee/xml/ns/jaxb`"; replace the Maven snippet with the
+   `org.jvnet.jaxb` one.
+5. CI unchanged (11/17/21).
+
+## Verification
+
+Exactly the trial: suite green on 17 and 21; CLI jar output for `samples/po` and the OWS 1.1.0
+fixture byte-identical to the last `javax` release (CR-003 makes this comparison meaningful); a
+throwaway consumer project using `jaxb-maven-plugin` 4.0.16 with `-Xjsonix` generates mappings.
+
+## Risks
+
+- Low for the code (proved by the trial).
+- The Jakarta `DatatypeConverter` base64 bug suggests re-checking the other converter uses
+  (`parseHexBinary`, `parseQName`); both passed the existing tests, which cover hex and QName
+  enumerations in the `zero` schema.
+- Users who miss the binding-namespace change get silently wrong output (customizations ignored,
+  default package). Worth a loud note in the release notes and README.
 
 ## Effort
 
-Two to four days, most of it in re-verifying `MModelInfo`-based analysis against jaxb-basics 4.
+Half a day, plus whatever the final `javax` release takes.
