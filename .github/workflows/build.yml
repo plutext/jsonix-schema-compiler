@@ -11,8 +11,8 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        # CR-001: the build needs a JDK 8 toolchain (source/target 1.6). CR-002 widens this to 11/17/21.
-        java: ["8"]
+        # CR-002: JDK 11+ toolchain, Java 11 bytecode.
+        java: ["11", "17", "21"]
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-java@v4
@@ -35,5 +35,4 @@ jobs:
       - name: Verify no system-scoped dependencies of our own
         run: |
           ./mvnw -B -q -ntp -Ptests -pl '!npm' dependency:tree -DoutputFile=target/tree.txt -DappendOutput=true
-          # com.sun:tools:jar is pulled transitively by JAXB 2.2.11's istack-commons-tools; removed by CR-002.
-          ! grep ':system' target/tree.txt | grep -v 'com.sun:tools:jar'
+          ! grep ':system' target/tree.txt

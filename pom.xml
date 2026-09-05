@@ -115,8 +115,10 @@
 		<jsonix-scripts.version>2.2.1</jsonix-scripts.version>
 		<jaxb2-basics.version>0.11.0</jaxb2-basics.version>
 		<js-codemodel.version>1.1</js-codemodel.version>
-		<jaxb.version>2.2.11</jaxb.version>
-		<maven-jaxb2-plugin.version>0.13.1</maven-jaxb2-plugin.version>
+		<jaxb.version>2.3.9</jaxb.version>
+		<jaxb-api.version>2.3.1</jaxb-api.version>
+		<javax.activation.version>1.2.0</javax.activation.version>
+		<maven-jaxb2-plugin.version>0.15.3</maven-jaxb2-plugin.version>
 		<jgrapht.version>0.9.0</jgrapht.version>
 		<slf4j.version>1.7.7</slf4j.version>
 		<args4j.version>2.0.29</args4j.version>
@@ -140,8 +142,9 @@
 		<build-helper-maven-plugin.version>3.6.1</build-helper-maven-plugin.version>
 		<exec-maven-plugin.version>3.6.3</exec-maven-plugin.version>
 		<versions-maven-plugin.version>2.21.0</versions-maven-plugin.version>
-		<!-- Toolchain: source/target 1.6 needs a JDK 8 compiler; CR-002 raises this. -->
-		<jsonix.required-java-version>[1.8,1.9)</jsonix.required-java-version>
+		<!-- Toolchain (CR-002): build on JDK 11+, emit Java 11 bytecode. -->
+		<maven.compiler.release>11</maven.compiler.release>
+		<jsonix.required-java-version>[11,)</jsonix.required-java-version>
 		<jsonix.required-maven-version>[3.6.3,)</jsonix.required-maven-version>
 	</properties> 
 	<dependencies>
@@ -195,6 +198,17 @@
 				<groupId>junit</groupId>
 				<artifactId>junit</artifactId>
 				<version>4.13.2</version>
+			</dependency>
+			<!-- JAXB API and activation left the JDK in Java 11; declare them explicitly -->
+			<dependency>
+				<groupId>javax.xml.bind</groupId>
+				<artifactId>jaxb-api</artifactId>
+				<version>${jaxb-api.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>com.sun.activation</groupId>
+				<artifactId>javax.activation</artifactId>
+				<version>${javax.activation.version}</version>
 			</dependency>
 			<dependency>
 				<groupId>org.glassfish.jaxb</groupId>
@@ -312,10 +326,6 @@
 					<groupId>org.apache.maven.plugins</groupId>
 					<artifactId>maven-compiler-plugin</artifactId>
 					<version>${maven-compiler-plugin.version}</version>
-					<configuration>
-						<source>1.6</source>
-						<target>1.6</target>
-					</configuration>
 				</plugin>
 				<plugin>
 					<groupId>org.apache.maven.plugins</groupId>
@@ -450,7 +460,7 @@
 							<rules>
 								<requireJavaVersion>
 									<version>${jsonix.required-java-version}</version>
-									<message>This project compiles with source/target 1.6 and needs a JDK 8 toolchain (e.g. JAVA_HOME=/usr/lib/jvm/java-8-openjdk). See docs/change-requests/CR-002 for the Java 11 migration.</message>
+									<message>This project requires JDK 11 or newer (see docs/change-requests/CR-002).</message>
 								</requireJavaVersion>
 								<requireMavenVersion>
 									<version>${jsonix.required-maven-version}</version>

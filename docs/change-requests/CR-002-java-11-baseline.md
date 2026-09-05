@@ -1,6 +1,6 @@
 # CR-002: Move to a Java 11 baseline (JAXB 2.3.x)
 
-**Status:** Proposed
+**Status:** Implemented (2026-09-06)
 **Depends on:** CR-001 (needed to verify this change with the integration suite)
 **Recommended order:** second
 
@@ -147,3 +147,28 @@ allows this CR to be verified by a byte-for-byte diff of generated mappings.
 ## Effort
 
 Half a day including CI matrix and README updates; the trial migration itself took under an hour.
+
+## Implementation notes (2026-09-06)
+
+Implemented as proposed, choosing `maven.compiler.release` **11** (so the CLI jar no longer runs on
+JDK 8, which now fails with `UnsupportedClassVersionError`; switch the property to 8 if that matters).
+
+Verification (JDK 11 is not installed on the build machine; 17 and 21 were used):
+
+| Check | Result |
+|-------|--------|
+| `./mvnw clean install -Ptests -pl '!npm'` on JDK 17 | green: 28 + 4 unit tests, `filter`/`wps`/`zero`/`issues` pass |
+| same on JDK 21 | green |
+| class file major version | 55 (Java 11) |
+| `full` jar on JDK 17 and 21 against `samples/po` | `.std.js`, `.cmp.js`, `.jsonschema` produced |
+| `full` jar on JDK 8 | rejected (`UnsupportedClassVersionError`), as intended |
+| JDK 8 `./mvnw validate` | enforcer: "requires JDK 11 or newer" |
+| `dependency:tree` `system`-scoped entries | 0 (the transitive `tools.jar` from JAXB 2.2.11 is gone) |
+| JDK 17 vs JDK 21 generated output | same lines, different order (CR-003) |
+
+Other notes:
+
+- `jaxb2-basics` (0.11.0), `jgrapht-core` (0.9.0), `js-codemodel` (1.1) and `args4j` (2.0.29) were
+  left unchanged, as proposed.
+- CI matrix is now 11/17/21 and the `system`-scope check no longer needs an exclusion.
+- README gained a "Requirements" section (Java 11+, JAXB 2.3.1+, `maven-jaxb2-plugin` 0.14.0+).

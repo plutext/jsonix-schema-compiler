@@ -6,20 +6,23 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 An XJC (JAXB schema compiler) plugin that generates [Jsonix](https://github.com/highsource/jsonix) JavaScript mappings, and optionally JSON Schema, from XML Schemas. Documentation lives in the [GitHub wiki](https://github.com/highsource/jsonix-schema-compiler/wiki); the README covers command-line, NPM, Ant and Maven usage.
 
-## Toolchain: Java 8 is required
+## Toolchain: JDK 11 or newer
 
-The poms compile with `source`/`target` 1.6 and depend on JAXB 2.2.11 / `com.sun.tools.xjc`. The
-machine default is JDK 21; `maven-enforcer-plugin` rejects it at `validate` with a message pointing
-here. Always run Maven with JDK 8:
+The build emits Java 11 bytecode (`maven.compiler.release` 11) and uses JAXB 2.3.9 (`javax.xml.bind`
+line; `jaxb-api` and `javax.activation` are declared explicitly because they left the JDK in 11).
+`maven-enforcer-plugin` rejects JDK 8 at `validate`. Any of the installed JDKs 17 or 21 work:
 
 ```
-export JAVA_HOME=/usr/lib/jvm/java-8-openjdk
+export JAVA_HOME=/usr/lib/jvm/java-17-openjdk
 ```
 
 Use the wrapper (`./mvnw`, pinned to Maven 3.9.16). All plugin versions are pinned in the root pom's
 `pluginManagement`. The `npm` module invokes `npm install` during `compile`, so `npm` must be on the
 PATH for a full build (or exclude it with `-pl '!npm'`); it also drops `lib/`, `node_modules/` and
 `package-lock.json` into `npm/`, which are not tracked.
+
+Generated mapping order depends on the JDK/JAXB version (hash-ordered sets in `definition.Mapping`);
+see CR-003 before comparing generated files across toolchains.
 
 ## Build and test commands
 
@@ -60,9 +63,9 @@ Migration proposals (Java 11, JAXB 2.3, deterministic output, Jakarta) live in `
 
 - `compiler/` — all the logic. `JsonixPlugin` is registered as an XJC plugin via `META-INF/services/com.sun.tools.xjc.Plugin`. JAXB/XJC are `provided` scope here.
 - `plugin/` — shaded jar of `compiler` (for the Ant/xjc classpath). Contains only a `Dummy` class.
-- `full/` — shaded executable jar bundling XJC, the JAXB runtime and slf4j-simple. Adds `JsonixMain` (CLI entry point) and the `TargetDirectory*Writer` classes that write files to disk.
+- `full/` — shaded executable jar bundling XJC, the JAXB runtime, `jaxb-api`, `javax.activation` and slf4j-simple. Adds `JsonixMain` (CLI entry point) and the `TargetDirectory*Writer` classes that write files to disk.
 - `npm/` — wraps the `full` jar as `lib/jsonix-schema-compiler-full.jar`. `npm/package.json` is *generated* by resource filtering from `npm/src/main/npm/package.json`; edit the latter.
-- `tests/` (profile `tests`) — integration tests driven by `maven-jaxb2-plugin`: `zero`, `filter`, `wps`, and `issues` (GitHub issue regressions).
+- `tests/` (profile `tests`) — integration tests driven by `maven-jaxb2-plugin` 0.15.3: `zero`, `filter`, `wps`, and `issues` (GitHub issue regressions). `tests/zero` uses the 2010-era `legato-testing` JsUnit runner and needs `--add-opens java.base/java.net` (set in its surefire config).
 - `samples/po` (profile `samples`), `dist/` (profile `dist`), `demos/po-npm` (not built by Maven).
 
 ## Compilation pipeline (compiler module)

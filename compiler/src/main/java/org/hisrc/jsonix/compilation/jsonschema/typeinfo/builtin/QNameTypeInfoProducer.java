@@ -12,7 +12,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.hisrc.jsonix.compilation.jsonschema.JsonSchemaMappingCompiler;
 import org.hisrc.jsonix.compilation.jsonschema.typeinfo.BuiltinLeafInfoProducer;
 import org.jvnet.jaxb2_commons.xmlschema.XmlSchemaConstants;
-import org.relaxng.datatype.ValidationContext;
+import com.sun.tools.rngdatatype.ValidationContext;
 
 import com.sun.xml.xsom.XmlString;
 

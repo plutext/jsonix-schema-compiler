@@ -5,7 +5,7 @@ Everything below is plain Maven and works on any OS via the wrapper.
 
 ## Prerequisites
 
-- JDK 8 on `JAVA_HOME` (the enforcer rejects anything else until CR-002 lands).
+- JDK 11 or newer on `JAVA_HOME` (the enforcer rejects older JDKs).
 - `npm` on the PATH if you build the `npm` module.
 - For signed releases: a GPG key and, in `~/.m2/settings.xml`, a `<server>` entry for whatever
   repository you deploy to.

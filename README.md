@@ -4,6 +4,13 @@ Generates [Jsonix](https://github.com/highsource/jsonix) mappings for XML Schema
 
 Please refer to [Wiki](https://github.com/highsource/jsonix-schema-compiler/wiki) for documentation.
 
+## Requirements
+
+- **Java 11 or newer** to run the compiler (CLI jar, Ant, Maven or NPM usage).
+- As an XJC plugin it requires JAXB 2.3.1 or newer (`javax.xml.bind` line, not Jakarta); with Maven use
+  `org.jvnet.jaxb2.maven2:maven-jaxb2-plugin` 0.14.0 or newer (0.15.3 is the last release).
+- Building from source: JDK 11+ and the bundled Maven wrapper (`./mvnw`).
+
 ## Using in command-line
 
 Download `jsonix-schema-compiler-full-<VERSION>.jar` from [releases](https://github.com/highsource/jsonix-schema-compiler/releases) and run it with `java -jar` from the command line:

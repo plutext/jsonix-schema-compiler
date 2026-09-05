@@ -13,7 +13,7 @@ import org.hisrc.jscm.codemodel.expression.JSObjectLiteral;
 import org.hisrc.jsonix.compilation.mapping.MappingCompiler;
 import org.hisrc.jsonix.compilation.mapping.typeinfo.BuiltinLeafInfoCompiler;
 import org.jvnet.jaxb2_commons.xmlschema.XmlSchemaConstants;
-import org.relaxng.datatype.ValidationContext;
+import com.sun.tools.rngdatatype.ValidationContext;
 
 import com.sun.xml.xsom.XmlString;
 

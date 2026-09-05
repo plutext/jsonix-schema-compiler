@@ -59,6 +59,15 @@
 		</testResources>
 		<plugins>
 			<plugin>
+				<!-- legato-testing 1.1.1 (HtmlUnit-based JsUnit runner) reflects into java.net.URL;
+				     JDK 17+ requires the package to be opened explicitly. -->
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-surefire-plugin</artifactId>
+				<configuration>
+					<argLine>--add-opens java.base/java.net=ALL-UNNAMED</argLine>
+				</configuration>
+			</plugin>
+			<plugin>
 				<groupId>org.jvnet.jaxb2.maven2</groupId>
 				<artifactId>maven-jaxb2-plugin</artifactId>
 				<configuration>
