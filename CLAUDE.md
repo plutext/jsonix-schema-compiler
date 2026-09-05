@@ -21,8 +21,9 @@ Use the wrapper (`./mvnw`, pinned to Maven 3.9.16). All plugin versions are pinn
 PATH for a full build (or exclude it with `-pl '!npm'`); it also drops `lib/`, `node_modules/` and
 `package-lock.json` into `npm/`, which are not tracked.
 
-Generated mapping order depends on the JDK/JAXB version (hash-ordered sets in `definition.Mapping`);
-see CR-003 before comparing generated files across toolchains.
+Generated output order is deterministic (CR-003): `definition.Mapping` returns class/enum infos sorted
+by scoped local name and element infos by (namespace, local part, scope) via `InfoComparators`, so
+generated files can be diffed across toolchains. `DeterministicOrderTest` guards this.
 
 ## Build and test commands
 

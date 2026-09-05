@@ -1,7 +1,7 @@
 package org.hisrc.jsonix.definition;
 
 import java.util.Collection;
-import java.util.HashSet;
+import java.util.LinkedHashSet;
 
 import org.apache.commons.lang3.Validate;
 import org.hisrc.jsonix.analysis.DefaultInfoVertexVisitor;
@@ -22,10 +22,10 @@ import org.jvnet.jaxb2_commons.xml.bind.model.util.DefaultTypeInfoVisitor;
 public class MappingDependency<T, C extends T> {
 
 	private final MPackageInfo packageInfo;
-	private final Collection<MClassInfo<T, C>> classInfos = new HashSet<MClassInfo<T, C>>();
-	private final Collection<MPropertyInfo<T, C>> propertyInfos = new HashSet<MPropertyInfo<T, C>>();
-	private final Collection<MEnumLeafInfo<T, C>> enumLeafInfos = new HashSet<MEnumLeafInfo<T, C>>();
-	private final Collection<MElementInfo<T, C>> elementInfos = new HashSet<MElementInfo<T, C>>();
+	private final Collection<MClassInfo<T, C>> classInfos = new LinkedHashSet<MClassInfo<T, C>>();
+	private final Collection<MPropertyInfo<T, C>> propertyInfos = new LinkedHashSet<MPropertyInfo<T, C>>();
+	private final Collection<MEnumLeafInfo<T, C>> enumLeafInfos = new LinkedHashSet<MEnumLeafInfo<T, C>>();
+	private final Collection<MElementInfo<T, C>> elementInfos = new LinkedHashSet<MElementInfo<T, C>>();
 
 	public MappingDependency(MPackageInfo packageInfo) {
 		this.packageInfo = Validate.notNull(packageInfo);

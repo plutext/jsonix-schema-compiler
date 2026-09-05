@@ -3,8 +3,11 @@ package org.hisrc.jsonix.definition;
 import java.text.MessageFormat;
 import java.util.Collection;
 import java.util.Deque;
-import java.util.HashMap;
-import java.util.HashSet;
+import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 import java.util.LinkedList;
 import java.util.Map;
 import java.util.Set;
@@ -39,18 +42,18 @@ public class Mapping<T, C extends T> {
 	private final Logger logger;
 	private final ModelInfoGraphAnalyzer<T, C> analyzer;
 	private final MPackageInfo packageInfo;
-	private final Collection<MClassInfo<T, C>> classInfos = new HashSet<MClassInfo<T, C>>();
-	private final Collection<MPropertyInfo<T, C>> propertyInfos = new HashSet<MPropertyInfo<T, C>>();
-	private final Collection<MEnumLeafInfo<T, C>> enumLeafInfos = new HashSet<MEnumLeafInfo<T, C>>();
-	private final Collection<MElementInfo<T, C>> elementInfos = new HashSet<MElementInfo<T, C>>();
-	private final Collection<InfoVertex<T, C>> infoVertices = new HashSet<InfoVertex<T, C>>();
+	private final Collection<MClassInfo<T, C>> classInfos = new LinkedHashSet<MClassInfo<T, C>>();
+	private final Collection<MPropertyInfo<T, C>> propertyInfos = new LinkedHashSet<MPropertyInfo<T, C>>();
+	private final Collection<MEnumLeafInfo<T, C>> enumLeafInfos = new LinkedHashSet<MEnumLeafInfo<T, C>>();
+	private final Collection<MElementInfo<T, C>> elementInfos = new LinkedHashSet<MElementInfo<T, C>>();
+	private final Collection<InfoVertex<T, C>> infoVertices = new LinkedHashSet<InfoVertex<T, C>>();
 	private final String packageName;
 	private final String mappingName;
 	private final String schemaId;
 	private final String targetNamespaceURI;
 	private final String defaultElementNamespaceURI;
 	private final String defaultAttributeNamespaceURI;
-	private final Map<InfoVertex<T, C>, ContainmentType> verticesContainmentMap = new HashMap<InfoVertex<T, C>, ContainmentType>();
+	private final Map<InfoVertex<T, C>, ContainmentType> verticesContainmentMap = new LinkedHashMap<InfoVertex<T, C>, ContainmentType>();
 
 	public Mapping(JsonixContext context,
 			ModelInfoGraphAnalyzer<T, C> analyzer, MPackageInfo packageInfo,
@@ -143,10 +146,11 @@ public class Mapping<T, C extends T> {
 	}
 
 	public Collection<MappingDependency<T, C>> getDirectDependencies() {
-		final Map<MPackageInfo, MappingDependency<T, C>> dependencies = new HashMap<MPackageInfo, MappingDependency<T, C>>();
+		// Keyed by package name so that the dependency order is stable.
+		final Map<String, MappingDependency<T, C>> dependencies = new TreeMap<String, MappingDependency<T, C>>();
 		final DirectedGraph<InfoVertex<T, C>, DependencyEdge> graph = analyzer
 				.getGraph();
-		final Collection<InfoVertex<T, C>> vertices = new HashSet<InfoVertex<T, C>>(
+		final Collection<InfoVertex<T, C>> vertices = new LinkedHashSet<InfoVertex<T, C>>(
 				getInfoVertices());
 		for (InfoVertex<T, C> sourceVertex : vertices) {
 			final Set<DependencyEdge> edges = graph
@@ -162,11 +166,12 @@ public class Mapping<T, C extends T> {
 					if (packageInfo != null
 							&& !this.packageInfo.equals(packageInfo)) {
 						MappingDependency<T, C> dependency = dependencies
-								.get(packageInfo);
+								.get(packageInfo.getPackageName());
 						if (dependency == null) {
 							dependency = new MappingDependency<T, C>(
 									packageInfo);
-							dependencies.put(packageInfo, dependency);
+							dependencies.put(packageInfo.getPackageName(),
+									dependency);
 						}
 						dependency.addInfoVertex(targetVertex);
 					}
@@ -464,20 +469,38 @@ public class Mapping<T, C extends T> {
 		return defaultAttributeNamespaceURI;
 	}
 
+	/**
+	 * Class infos in a stable order (see {@link InfoComparators}).
+	 */
 	public Collection<MClassInfo<T, C>> getClassInfos() {
-		return this.classInfos;
+		final List<MClassInfo<T, C>> sorted = new ArrayList<MClassInfo<T, C>>(
+				this.classInfos);
+		Collections.sort(sorted, InfoComparators.PACKAGED_TYPE_INFO);
+		return Collections.unmodifiableList(sorted);
 	}
 
 	public Collection<MPropertyInfo<T, C>> getPropertyInfos() {
 		return propertyInfos;
 	}
 
+	/**
+	 * Enum leaf infos in a stable order (see {@link InfoComparators}).
+	 */
 	public Collection<MEnumLeafInfo<T, C>> getEnumLeafInfos() {
-		return this.enumLeafInfos;
+		final List<MEnumLeafInfo<T, C>> sorted = new ArrayList<MEnumLeafInfo<T, C>>(
+				this.enumLeafInfos);
+		Collections.sort(sorted, InfoComparators.PACKAGED_TYPE_INFO);
+		return Collections.unmodifiableList(sorted);
 	}
 
+	/**
+	 * Element infos in a stable order (see {@link InfoComparators}).
+	 */
 	public Collection<MElementInfo<T, C>> getElementInfos() {
-		return this.elementInfos;
+		final List<MElementInfo<T, C>> sorted = new ArrayList<MElementInfo<T, C>>(
+				this.elementInfos);
+		Collections.sort(sorted, InfoComparators.ELEMENT_INFO);
+		return Collections.unmodifiableList(sorted);
 	}
 
 	@Override

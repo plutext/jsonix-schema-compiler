@@ -1,6 +1,6 @@
 # CR-003: Deterministic ordering of generated mappings
 
-**Status:** Proposed
+**Status:** Implemented (2026-09-06)
 **Depends on:** nothing (best done together with CR-002, before or after)
 
 ## Summary
@@ -59,3 +59,29 @@ reorder once, on the first regeneration after this change.
 ## Effort
 
 Two to three hours.
+
+## Implementation notes (2026-09-06)
+
+Implemented slightly differently from the proposal: the sort lives in the **definition layer**
+rather than in each emitter, so the JS mapping compiler and the JSON Schema compiler share it
+without any change of their own.
+
+- New `definition.InfoComparators`: `PACKAGED_TYPE_INFO` (scoped local name, then fully
+  qualified name) and `ELEMENT_INFO` (namespace URI, local part, then scope's scoped local name;
+  global elements first).
+- `definition.Mapping`: `getClassInfos()`, `getEnumLeafInfos()` and `getElementInfos()` return
+  sorted, unmodifiable lists; `getDirectDependencies()` is keyed by package name in a `TreeMap`,
+  so the `dependencies` array is stable too; all `HashSet`/`HashMap` fields became linked
+  variants. `MappingDependency` likewise.
+- Property order within a type is untouched (still schema order).
+- New unit test `xjc.plugin.tests.ordering.DeterministicOrderTest` compiles `basic/zero` and
+  asserts the JSON Schema `definitions` keys are the 18 class infos sorted followed by the 7 enum
+  infos sorted, and that the 64 `anyOf` element infos are sorted by
+  (namespace URI, local part, scope).
+
+Verification: the same `full` jar run on JDK 17 and JDK 21 now produces byte-identical
+`.js` and `.jsonschema` files for `samples/po` and for OGC OWS 1.1.0 (`full/src/test/resources`),
+where it previously differed. Full suite green on JDK 17 and 21 (29 + 4 unit tests,
+`filter`/`wps`/`zero`/`issues`).
+
+Visible effect for users: committed mapping files reorder once on the first regeneration.
