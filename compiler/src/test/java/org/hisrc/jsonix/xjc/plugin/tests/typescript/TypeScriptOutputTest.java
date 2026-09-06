@@ -107,6 +107,9 @@ public class TypeScriptOutputTest {
 		assertTrue(ts.contains("content?: (TypedNamedValue<string> | string)[];"));
 		assertTrue(ts.contains("dateTime?: XmlCalendar;"));
 		assertTrue(ts.contains("qName?: XmlQName;"));
+		// PARENT (CR-006): the union of containing types; root-only types have none
+		assertTrue(ts.contains("export interface ExtendedType extends BaseType {\n  TYPE_NAME?: 'org_hisrc_jsonix_tests_zero.ExtendedType' | 'org_hisrc_jsonix_tests_zero.ExtendedExtendedType';\n  readonly PARENT?: ElementRefType;"));
+		assertTrue(ts.contains("export interface ElementRefType {\n  TYPE_NAME?: 'org_hisrc_jsonix_tests_zero.ElementRefType';\n  base:"));
 		// global elements and their union
 		assertTrue(ts.contains("export type RootElement = "));
 		assertTrue(ts.contains("export declare const org_hisrc_jsonix_tests_zero: JsonixMapping<RootElement>;"));

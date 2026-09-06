@@ -150,6 +150,11 @@ po.orderDate?.year; // number | undefined (dates are Jsonix calendars, not JS Da
 - Required properties are non-optional, collections are arrays, choices are unions, `elementRef`
   properties are `TypedNamedValue<T>` unions (with `string` when mixed), enums are literal unions,
   and `TYPE_NAME` is a literal union over the type and its subtypes, usable as a discriminant.
+- `readonly PARENT?: A | B` names the types that can contain the type (through their properties,
+  substitution groups and subtypes). The runtime fills it in when unmarshalling with
+  `new Jsonix.Context(mappings, { parentPointers: true })` (`@mitre/jsonix` 3.2.0+, jsonix-CR-002),
+  and `Jsonix.Util.deepCopy(value)` copies a subtree and re-links the pointers, like docx4j's
+  `-Xparent-pointer` / `-Xdocx4j-copy` model. Types that only occur at the root have no `PARENT`.
 - Cross-module references become `import type * as ... from './<other module>'`.
 - Customise the file name with `<jsonix:typeScript fileName="${module.name}.d.ts"/>` inside
   `jsonix:module` (or at the top level of the bindings). One file per module; naming

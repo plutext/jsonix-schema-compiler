@@ -34,6 +34,8 @@ public final class Ts {
 	/** Phantom member carrying the root element type of a mapping (jsonix-CR-001 item 6). */
 	public static final String ROOT_ELEMENT_MEMBER = "__rootElement";
 	public static final String TYPE_NAME_PROPERTY = "TYPE_NAME";
+	/** Parent pointer set by the runtime when unmarshalling with parentPointers (CR-006). */
+	public static final String PARENT_PROPERTY = "PARENT";
 
 	private static final Set<String> RESERVED = new HashSet<String>(Arrays.asList("break", "case", "catch",
 			"class", "const", "continue", "debugger", "default", "delete", "do", "else", "enum", "export",

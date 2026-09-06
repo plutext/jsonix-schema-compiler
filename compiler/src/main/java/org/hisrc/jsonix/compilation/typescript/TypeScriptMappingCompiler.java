@@ -120,7 +120,18 @@ public class TypeScriptMappingCompiler<T, C extends T> {
 		sb.append(" {\n");
 		sb.append(TsNode.INDENT).append(Ts.TYPE_NAME_PROPERTY).append("?: ")
 				.append(moduleCompiler.typeNameLiteral(classInfo)).append(";\n");
+		final String parentType = moduleCompiler.parentType(classInfo);
+		if (parentType != null) {
+			sb.append(TsNode.INDENT).append("readonly ").append(Ts.PARENT_PROPERTY).append("?: ").append(parentType)
+					.append(";\n");
+		}
 		for (MPropertyInfo<T, C> propertyInfo : classInfo.getProperties()) {
+			final String propertyName = propertyInfo.getPrivateName();
+			if (Ts.TYPE_NAME_PROPERTY.equals(propertyName) || Ts.PARENT_PROPERTY.equals(propertyName)) {
+				throw new IllegalStateException("The property [" + propertyName + "] of the type ["
+						+ moduleCompiler.typeName(classInfo) + "] clashes with the [" + propertyName
+						+ "] member that Jsonix sets on unmarshalled objects; rename it with a jaxb:property customization.");
+			}
 			if (mapping.getPropertyInfos().contains(propertyInfo)) {
 				sb.append(TsNode.INDENT).append(propertyInfo.acceptPropertyInfoVisitor(properties)).append('\n');
 			}

@@ -3,7 +3,7 @@
 import { Jsonix } from '@mitre/jsonix';
 import { PO } from '../../../target/generated-sources/xjc/PurchaseOrder.std';
 import { PO as PO_ESM } from '../../../target/generated-sources/xjc/PurchaseOrder.mjs';
-import type { PurchaseOrderElement, RootElement, USAddress, Items, XmlCalendar } from '../../../target/generated-sources/xjc/PurchaseOrder.std';
+import type { PurchaseOrderElement, PurchaseOrderType, RootElement, USAddress, Items, XmlCalendar } from '../../../target/generated-sources/xjc/PurchaseOrder.std';
 
 declare const xml: string;
 
@@ -34,6 +34,12 @@ unmarshaller.unmarshalFile<RootElement>('po.xml', (root) => void root.name.local
 type RootOfPO = NonNullable<typeof PO.__rootElement>;
 const sameRoot: RootOfPO = element;
 
+// PARENT (CR-006): typed as the union of containing types; a root-only type has no PARENT member.
+const itemParent: Items | undefined = firstItem?.PARENT;
+const addressParent: PurchaseOrderType | undefined = po.shipTo.PARENT;
+// @ts-expect-error PurchaseOrderType only occurs at the root, so it has no PARENT
+const rootParent = po.PARENT;
+
 // Generated support types are structurally the runtime's own.
 const runtimeCalendar: Jsonix.XML.Calendar | undefined = shipDate;
 const runtimeName: Jsonix.XML.QName = element.name;
@@ -55,4 +61,4 @@ const incomplete: USAddress = { name: 'x' };
 // @ts-expect-error a bare record is not an element
 marshaller.marshalString({ foo: 'bar' });
 
-export { esmContext, name, zip, partNum, year, comment, typeName, sameRoot, runtimeCalendar, runtimeName, out, misspelt, wrongType, incomplete };
+export { esmContext, name, zip, partNum, year, comment, typeName, sameRoot, itemParent, addressParent, rootParent, runtimeCalendar, runtimeName, out, misspelt, wrongType, incomplete };

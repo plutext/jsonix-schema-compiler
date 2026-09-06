@@ -58,6 +58,8 @@
 				<artifactId>jaxb-maven-plugin</artifactId>
 				<configuration>
 					<extension>true</extension>
+					<!-- The generated files depend on the compiler, not only on the schema: always regenerate. -->
+					<forceRegenerate>true</forceRegenerate>
 					<args>
 						<arg>-Xjsonix</arg>
 						<arg>-Xjsonix-generateTypeScript</arg>

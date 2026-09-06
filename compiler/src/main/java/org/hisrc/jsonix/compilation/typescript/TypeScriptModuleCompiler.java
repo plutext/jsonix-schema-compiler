@@ -3,6 +3,7 @@ package org.hisrc.jsonix.compilation.typescript;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -20,6 +21,7 @@ import org.jvnet.jaxb.xml.bind.model.MClassInfo;
 import org.jvnet.jaxb.xml.bind.model.MClassTypeInfo;
 import org.jvnet.jaxb.xml.bind.model.MElementInfo;
 import org.jvnet.jaxb.xml.bind.model.MPackagedTypeInfo;
+import org.jvnet.jaxb.xml.bind.model.MPropertyInfo;
 
 /**
  * Produces the TypeScript declaration file of a module ({@code <Module>.d.ts})
@@ -50,6 +52,8 @@ public class TypeScriptModuleCompiler<T, C extends T> {
 	private final Map<QName, List<MElementInfo<T, C>>> substitutions = new LinkedHashMap<QName, List<MElementInfo<T, C>>>();
 	/** TYPE_NAME of a class → its direct subclasses (across all modules). */
 	private final Map<String, List<MClassInfo<T, C>>> subclasses = new LinkedHashMap<String, List<MClassInfo<T, C>>>();
+	/** TYPE_NAME of a class → the classes with a property that can hold it (CR-006). */
+	private final Map<String, Set<MClassInfo<T, C>>> containers = new LinkedHashMap<String, Set<MClassInfo<T, C>>>();
 
 	public TypeScriptModuleCompiler(Modules<T, C> modules, Module<T, C> module, TypeScript typeScript) {
 		this.modules = Validate.notNull(modules);
@@ -85,6 +89,81 @@ public class TypeScriptModuleCompiler<T, C extends T> {
 				list.add(classInfo);
 			}
 		}
+		for (MClassInfo<T, C> classInfo : modules.getModelInfo().getClassInfos()) {
+			final HeldTypesCollector<T, C> collector = new HeldTypesCollector<T, C>(this);
+			for (MPropertyInfo<T, C> propertyInfo : classInfo.getProperties()) {
+				propertyInfo.acceptPropertyInfoVisitor(collector);
+			}
+			for (MClassTypeInfo<T, C, ?> held : collector.getHeldTypes()) {
+				// A property declared as T can hold T or any of its subtypes.
+				for (String heldName : typeNamesOfSelfAndSubtypes(typeName(held))) {
+					Set<MClassInfo<T, C>> set = containers.get(heldName);
+					if (set == null) {
+						set = new LinkedHashSet<MClassInfo<T, C>>();
+						containers.put(heldName, set);
+					}
+					set.add(classInfo);
+				}
+			}
+		}
+	}
+
+	/**
+	 * The TypeScript type of the {@code PARENT} property: the union of all
+	 * classes that can contain the given class through one of their
+	 * properties (including subclasses of those containers, which inherit
+	 * the property), or {@code null} if nothing can, i.e. the type only
+	 * occurs at the root.
+	 */
+	public String parentType(MClassInfo<T, C> classInfo) {
+		// A value typed as this class may be an instance of any subtype, which may
+		// be held in more places; including them also keeps `extends` valid, since
+		// the subtype's PARENT union must be assignable to the base's.
+		final Set<MClassInfo<T, C>> direct = new LinkedHashSet<MClassInfo<T, C>>();
+		for (String name : typeNamesOfSelfAndSubtypes(typeName(classInfo))) {
+			final Set<MClassInfo<T, C>> set = containers.get(name);
+			if (set != null) {
+				direct.addAll(set);
+			}
+		}
+		if (direct.isEmpty()) {
+			return null;
+		}
+		final java.util.SortedSet<String> refs = new java.util.TreeSet<String>();
+		for (MClassInfo<T, C> container : direct) {
+			refs.add(ref(container));
+			for (MClassInfo<T, C> sub : subtypesOf(container)) {
+				refs.add(ref(sub));
+			}
+		}
+		return Ts.union(refs);
+	}
+
+	private List<String> typeNamesOfSelfAndSubtypes(String typeName) {
+		final List<String> names = new ArrayList<String>();
+		collectTypeNames(typeName, names, new HashSet<String>());
+		return names;
+	}
+
+	private List<MClassInfo<T, C>> subtypesOf(MClassInfo<T, C> classInfo) {
+		final List<MClassInfo<T, C>> result = new ArrayList<MClassInfo<T, C>>();
+		final java.util.Deque<MClassInfo<T, C>> queue = new java.util.ArrayDeque<MClassInfo<T, C>>();
+		final Set<String> visited = new HashSet<String>();
+		queue.add(classInfo);
+		while (!queue.isEmpty()) {
+			final MClassInfo<T, C> current = queue.removeFirst();
+			final List<MClassInfo<T, C>> subs = subclasses.get(typeName(current));
+			if (subs == null) {
+				continue;
+			}
+			for (MClassInfo<T, C> sub : subs) {
+				if (visited.add(typeName(sub))) {
+					result.add(sub);
+					queue.add(sub);
+				}
+			}
+		}
+		return result;
 	}
 
 	/**

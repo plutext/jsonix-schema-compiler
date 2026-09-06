@@ -1,6 +1,6 @@
 # CR-006: Parent pointers and deep copy for unmarshalled objects
 
-**Status:** Accepted 2026-09-07 (decisions below); compiler half in progress
+**Status:** Compiler half implemented 2026-09-07; runtime half (jsonix-CR-002) pending
 **Depends on:** CR-005 (TypeScript output). Runtime half: `jsonix-CR-002` in the sibling `jsonix` repository.
 **Recommended order:** runtime first (jsonix-CR-002), then this CR's TypeScript part.
 
@@ -21,14 +21,14 @@ Java consumer writes:
 ```ts
 const paragraph: P = ...;
 const cell = paragraph.PARENT;           // Tc | Body | Hdr | ... (typed union of possible parents)
-const clone = Jsonix.Util.deepCopy(paragraph); // clone.PARENT === paragraph.PARENT, children re-linked to clone
+const clone = Jsonix.Util.deepCopy(paragraph); // children re-linked to clone; clone.PARENT unset unless passed as 2nd argument
 ```
 
 Two halves:
 
 1. **Runtime** (`jsonix` repository, jsonix-CR-002): an unmarshal option that sets a non-enumerable
-   `PARENT` on every unmarshalled object, and `Jsonix.Util.deepCopy(value)` that copies a value
-   structurally and re-links `PARENT`.
+   `PARENT` on every object a class info produces, and `Jsonix.Util.deepCopy(value, parent?)` that
+   copies a value structurally and re-links `PARENT`.
 2. **Compiler** (this CR): the generated declarations type `PARENT` as the union of the types that
    can contain the type, computed from the model, and document the option; plus the CLI facts
    below.
@@ -57,23 +57,26 @@ From `ParentPointerPlugin`, `CopyPlugin` and `CopyUtils` (read 2026-09-07):
   JAXB's `afterUnmarshal` receives the bean, not the `JAXBElement`. Root objects have no parent.
   Collections: each item's parent is the owner.
 - **Copy**: value types are shared (strings, numbers, booleans, enum literals, `XmlDuration` in
-  docx4j's list); `XmlCalendar` and `XmlQName` are cloned; DOM nodes are `cloneNode(true)`; typed
-  objects are copied recursively; `TypedNamedValue` wrappers get a new wrapper with a cloned name
-  and a copied value; arrays are copied element-wise; `TYPE_NAME` is preserved; `PARENT` is
-  re-linked so that every copied child points at its copied parent and the copy's own `PARENT` is
-  the original's parent (docx4j: `copy()` leaves the parent unset, `copyObjectAndSetParent` sets it
-  to the new owner; the JavaScript API takes the parent as an optional second argument to cover
-  both).
+  docx4j's list); `XmlCalendar` and `XmlQName` are cloned; DOM nodes are `cloneNode(true)`; objects
+  and arrays are copied structurally (wrappers are not recognised by shape: a `{ name, value }`
+  wrapper cannot be told from a typed object with properties named `name` and `value`, both common);
+  `TYPE_NAME` is preserved. `PARENT` is re-linked from a map of original to copy, so every copied
+  child points at its copied parent. The copy's own `PARENT` is **unset**, as docx4j's `copy()`
+  leaves it; the optional second argument sets it, as `CopyUtils.copyObjectAndSetParent` does for
+  a new owner.
 - **Unknown properties** (not in the mapping) are copied structurally; the runtime does not need
   the mapping to copy, which keeps `deepCopy` usable on objects built by hand for marshalling.
 
 ## Runtime half (jsonix-CR-002, drafted alongside this CR)
 
 - `new Jsonix.Context(mappings, { parentPointers: true })` (default `false`, so existing users see
-  no change). When on, `ClassInfo.unmarshal`/`unmarshalProperty` set `PARENT` on every object value
-  assigned through `PropertyInfo.setProperty` (for typed named values on the `value`, for arrays on
-  each item), as a **non-enumerable, writable** property, so that `for...in`, `JSON.stringify`,
-  `Jsonix.Util.Type.isEqual` and the marshaller ignore it and cycles never reach serialisers.
+  no change). When on, `ClassInfo.unmarshal` sets `PARENT` on the object it produces from a stack
+  of enclosing results kept on the input, so only typed objects (class-info products) are parented,
+  never element wrappers, simplified-style `{ localName: value }` objects, maps, DOM nodes,
+  calendars or QNames, whichever mapping style is in use. The property is **non-enumerable and
+  writable**, so `for...in`, `JSON.stringify`, `Jsonix.Util.Type.isEqual` and the marshaller ignore
+  it and cycles never reach serialisers. This matches what the declarations describe: `PARENT` is
+  declared on interfaces only.
 - `Jsonix.Util.deepCopy(value, parent?)` with the semantics above; `Jsonix.Util.parentOf(value)`
   is not needed (the property is readable directly) but a `Jsonix.Util.setParent(value, parent)`
   helper keeps the non-enumerable definition in one place for code that builds trees by hand.
@@ -81,8 +84,8 @@ From `ParentPointerPlugin`, `CopyPlugin` and `CopyUtils` (read 2026-09-07):
   `deepCopy<T>(value: T, parent?: unknown): T`; `interface Parented<P = unknown> { readonly PARENT?: P }`.
 - Tests: the existing `tests/typescript` purchase order round trip with `parentPointers: true`
   (`po.items.item[0].PARENT === po.items`, `po.shipTo.PARENT === po`), a copy whose children point
-  at the copy, marshalling a parented tree produces the same XML as an unparented one, and
-  `isEqual(copy, original)` holds.
+  at the copy and whose own `PARENT` is unset, marshalling a parented tree produces the same XML as
+  an unparented one, and `isEqual(copy, original)` holds.
 
 ## Compiler half (this CR)
 
@@ -163,3 +166,43 @@ optional because parent pointers are an unmarshal option and hand-built objects 
    version of the runtime.
 3. Union size: measured on `org_docx4j_wml` during implementation; the outcome is recorded in the
    implementation notes below. No limit unless the measurement shows a need.
+
+## Implementation notes, compiler half (2026-09-07)
+
+- `HeldTypesCollector` (new) visits each class's properties and records the class types they can
+  hold (element, elements, elementRef and elementRefs, the latter two expanded through
+  substitution groups; wildcards, attributes and values hold no typed children).
+  `TypeScriptModuleCompiler` turns that into a containers index keyed by `TYPE_NAME`, registering a
+  container for the held type **and all its subtypes**, since a property declared as `T` accepts
+  them.
+- `parentType(classInfo)` unions the containers of the class **and of its subtypes** (a value
+  typed as the base may be a subtype instance held elsewhere), each expanded by the container's
+  own subclasses (which inherit the property); refs are sorted, so output is deterministic and
+  cross-module containers arrive through the existing `import type` mechanism. Without the
+  subtype part `tsc` rejected `CTEdnDocProps extends CTEdnProps` in WML, the same shape of error
+  that shaped `TYPE_NAME` in CR-005.
+- `TypeScriptMappingCompiler` emits `readonly PARENT?: <union>;` after `TYPE_NAME` and rejects a
+  schema property named `PARENT` or `TYPE_NAME` with an `IllegalStateException` (decision 1).
+- Measurement on `OfficeOpenXML/` (decision 3): 1,805 types carry `PARENT`; median union size 1,
+  90th percentile 5, maximum 113 (DrawingML `CTOfficeArtExtensionList`), seven unions above 40.
+  No limit was introduced; `tsc --strict` handles the file without complaint.
+- Tests: golden `PurchaseOrder.d.ts` (`Items`, `USAddress` and `Items.Item` have parents,
+  `PurchaseOrderType` has none), `zero` assertions (`ExtendedType` inherits `BaseType`'s container
+  `ElementRefType`), `usage.ts` reads `firstItem?.PARENT` as `Items` and gets a compile error on
+  the root's `PARENT`. `esm-smoke.mjs` runs the runtime checks (pointers, non-enumerability,
+  `deepCopy` re-linking) when `Jsonix.Util.deepCopy` exists and reports them as skipped until
+  jsonix-CR-002 lands. `tests/typescript` now sets `forceRegenerate`, because `jaxb-maven-plugin`
+  otherwise keeps stale declarations when only the compiler changed.
+- `OfficeOpenXML/` regenerated: declaration files changed, no mapping file changed.
+
+Revised 2026-09-07 after the runtime side reviewed jsonix-CR-002 against `jsonix.js` (see its
+"Revision notes"): the hook is `ClassInfo.unmarshal` with a stack of enclosing results, `PARENT`
+goes only on class-info products, `deepCopy` copies structurally without recognising wrappers by
+shape, and a copy's own `PARENT` is unset unless the `parent` argument is given. None of that
+changes the compiler; the "Semantics" and "Runtime half" sections above were corrected to match,
+and `esm-smoke.mjs` already asserted only what survives (it never asserted the copy's own
+`PARENT`).
+
+Still to do when jsonix-CR-002 lands as 3.2.0: bump the runtime dependency of `tests/typescript`,
+confirm the smoke's runtime checks run rather than skip, and have the runtime repository regenerate
+its fixture `tests/typescript/PurchaseOrder.d.ts` from the commit that contains this compiler half.
