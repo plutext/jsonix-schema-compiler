@@ -12,6 +12,7 @@ whose last upstream commit is from November 2018).
 | [CR-004](CR-004-jakarta-jaxb4.md) | Jakarta XML Binding / JAXB 4 / jaxb-tools 4.x | 3 | Implemented 2026-09-06 |
 | [CR-005](CR-005-typescript-output.md) | TypeScript output (`.d.ts` data model typings; ES-module mappings) | 4 | Implemented 2026-09-06 |
 | [CR-006](CR-006-parent-pointers-and-deep-copy.md) | Parent pointers and deep copy for unmarshalled objects (docx4j `-Xparent-pointer` / `-Xdocx4j-copy` parity; runtime half is jsonix-CR-002) | 5 | Compiler half implemented 2026-09-07; runtime half pending (jsonix-CR-002) |
+| [CR-007](CR-007-officeopenxml-generated-output-adjustments.md) | Equivalents of docx4j's `ModifyGeneratedSources` for the OfficeOpenXML output (`jsonix:propertyOrder`, `defaultValue` override, `inheritance:implements` unions, helper module) | 6 | Draft |
 
 All findings below were reproduced on 2026-09-06 on this machine (Maven 3.9.16, OpenJDK 8u502,
 17 and 21) against commit `a160ac7`. Trial migrations were done in scratch copies; nothing in the
