@@ -29,6 +29,9 @@ java -jar jsonix-schema-compiler-full-<VERSION>.jar
 ```
 
 See [Command-Line Usage](https://github.com/highsource/jsonix-schema-compiler/wiki/Command-Line-Usage).
+Other XJC plugin switches are passed through; the jar bundles the jaxb-tools plugins, so schemas whose
+annotations need `-Xinheritance`, `-Xannotate` or `-Xinject-code` compile by adding those switches.
+`OfficeOpenXML/` contains the mappings and TypeScript declarations generated this way from docx4j's schemas.
 
 ## Using with NPM
 
