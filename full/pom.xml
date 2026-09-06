@@ -13,6 +13,16 @@
 			<groupId>org.jvnet.jaxb</groupId>
 			<artifactId>jaxb-plugins-ant</artifactId>
 		</dependency>
+		<!-- Bundle the common XJC plugins (-Xinheritance, -Xannotate, ...) so the standalone
+		     compiler accepts schemas that carry their customizations (e.g. docx4j's). -->
+		<dependency>
+			<groupId>org.jvnet.jaxb</groupId>
+			<artifactId>jaxb-plugins</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.jvnet.jaxb</groupId>
+			<artifactId>jaxb-plugin-annotate</artifactId>
+		</dependency>
 		<dependency>
 			<groupId>${project.groupId}</groupId>
 			<artifactId>jsonix-schema-compiler</artifactId>

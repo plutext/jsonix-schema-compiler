@@ -24,6 +24,8 @@ public class DecimalTypeInfoProducer<T, C extends T, O> extends BuiltinLeafInfoP
 			return arrayBuilder.add("-Infinity").build().get(0);
 		} else if ("INF".equals(item)) {
 			return arrayBuilder.add("Infinity").build().get(0);
+		} else if ("NaN".equals(item)) {
+			return arrayBuilder.add("NaN").build().get(0);
 		} else {
 			return arrayBuilder.add(new BigDecimal(item)).build().get(0);
 		}

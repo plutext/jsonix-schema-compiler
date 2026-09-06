@@ -269,6 +269,11 @@
 				<artifactId>jaxb-plugins-tools</artifactId>
 				<version>${jaxb-plugins.version}</version>
 			</dependency>
+			<dependency>
+				<groupId>org.jvnet.jaxb</groupId>
+				<artifactId>jaxb-plugin-annotate</artifactId>
+				<version>${jaxb-plugins.version}</version>
+			</dependency>
 			<!-- JGraphT -->
 			<dependency>
 				<groupId>org.jgrapht</groupId>

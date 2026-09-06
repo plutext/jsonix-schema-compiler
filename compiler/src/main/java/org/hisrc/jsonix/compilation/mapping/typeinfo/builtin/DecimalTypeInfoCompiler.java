@@ -16,11 +16,13 @@ public class DecimalTypeInfoCompiler<T, C extends T, O> extends BuiltinLeafInfoC
 	@Override
 	public JSAssignmentExpression createValue(MappingCompiler<T, C> mappingCompiler, String item) {
 		final JSCodeModel codeModel = mappingCompiler.getCodeModel();
-		// Hack to make -INF an INF work
+		// XML Schema's special float/double values map to the JavaScript globals
 		if ("-INF".equals(item)) {
 			return codeModel.globalVariable("Infinity").negative();
 		} else if ("INF".equals(item)) {
 			return codeModel.globalVariable("Infinity");
+		} else if ("NaN".equals(item)) {
+			return codeModel.globalVariable("NaN");
 		} else {
 			return codeModel.decimal(item);
 		}
