@@ -57,4 +57,15 @@ public class Settings {
 		generateJsonSchema = value;
 	}
 
+	private boolean generateTypeScript = false;
+
+	public boolean isGenerateTypeScript() {
+		return generateTypeScript;
+	}
+
+	@Option(name = "-generateTypeScript", aliases = { "-Xjsonix-generateTypeScript" })
+	public void setGenerateTypeScript(boolean value) {
+		generateTypeScript = value;
+	}
+
 }

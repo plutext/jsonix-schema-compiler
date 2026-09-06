@@ -51,6 +51,7 @@ public class ModulesConfiguration {
 	private List<MappingConfiguration> mappingConfigurations = new LinkedList<MappingConfiguration>();
 	private List<OutputConfiguration> outputConfigurations = new LinkedList<OutputConfiguration>();
 	private List<JsonSchemaConfiguration> jsonSchemaConfigurations = new LinkedList<JsonSchemaConfiguration>();
+	private List<TypeScriptConfiguration> typeScriptConfigurations = new LinkedList<TypeScriptConfiguration>();
 
 	public List<ModuleConfiguration> getModuleConfigurations() {
 		return moduleConfigurations;
@@ -88,6 +89,15 @@ public class ModulesConfiguration {
 		this.jsonSchemaConfigurations = jsonSchemaConfigurations;
 	}
 
+	public List<TypeScriptConfiguration> getTypeScriptConfigurations() {
+		return typeScriptConfigurations;
+	}
+
+	public void setTypeScriptConfigurations(
+			List<TypeScriptConfiguration> typeScriptConfigurations) {
+		this.typeScriptConfigurations = typeScriptConfigurations;
+	}
+
 	public <T, C extends T> Modules<T, C> build(JsonixContext context,
 			MModelInfo<T, C> modelInfo) {
 
@@ -106,6 +116,7 @@ public class ModulesConfiguration {
 		assignModuleConfigurationsToMappingConfigurations(moduleConfigurations);
 		assignDefaultOutputConfigurations(moduleConfigurations);
 		assignDefaultJsonSchemaConfigurations(moduleConfigurations);
+		assignDefaultTypeScriptConfigurations(moduleConfigurations);
 
 		assignMappingNamesAndIdsToMappingConfigurations(context, moduleConfigurations);
 		assignModuleNamesToModules(context, moduleConfigurations);
@@ -270,6 +281,16 @@ public class ModulesConfiguration {
 			if (moduleConfiguration.getOutputConfigurations().isEmpty()) {
 				moduleConfiguration.getOutputConfigurations().addAll(
 						defaultOutputConfigurations);
+			}
+		}
+	}
+
+	private void assignDefaultTypeScriptConfigurations(
+			final List<ModuleConfiguration> moduleConfigurations) {
+		for (final ModuleConfiguration moduleConfiguration : moduleConfigurations) {
+			if (moduleConfiguration.getTypeScriptConfigurations().isEmpty()) {
+				moduleConfiguration.getTypeScriptConfigurations().addAll(
+						getTypeScriptConfigurations());
 			}
 		}
 	}

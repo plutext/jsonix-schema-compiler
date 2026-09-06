@@ -1,6 +1,6 @@
 # CR-005: TypeScript output
 
-**Status:** Proposed (draft, 2026-09-06)
+**Status:** Implemented (2026-09-06), phases 1 and 2
 **Depends on:** CR-003 (stable ordering; generated `.d.ts` files should be diffable), CR-004 (current toolchain)
 **Recommended order:** after CR-004
 
@@ -216,3 +216,50 @@ anonymous objects with no `TYPE_NAME` discriminant, no Calendar/QName shapes, an
    in declaration files are type-only and erased, so `isolatedModules`-style settings do not
    object; usage is `import type { Items } from './PurchaseOrder'` then `Items.Item`. Lint presets
    that forbid namespaces normally exclude generated declarations.
+
+## Implementation notes (2026-09-06)
+
+Both phases implemented as designed, with these refinements found while type-checking real output:
+
+- **`TYPE_NAME` is a union over the type and its (transitive) subtypes**, e.g.
+  `'OWS.DescriptionType' | 'OWS.BasicIdentificationType' | ...`. A literal of only the type's own name
+  made `extends` illegal (`Interface X incorrectly extends Y`), and is also wrong at runtime: a value
+  typed as the base may carry any subtype's name. Subtypes are collected across all modules.
+- **Builtin types are resolved through the property's schema component**, exactly as the mapping
+  compiler does (`CollectSimpleTypeNamesVisitor`), because the model's builtin leaf info for every
+  date-like type is one `XMLGregorianCalendar`; without this `xs:date` came out as `string`.
+- **Enum literals are whitespace-normalised** for the `normalizedString` family, mirroring
+  `NormalizedStringTypeInfoCompiler`, so the literal union matches the mapping's `values`.
+- Re-export files: `<output>.d.ts` (`export * from './<module>'`) per `.js` output and
+  `<output>.d.mts` (`export * from './<module>.js'`) per `.mjs` output; TypeScript's `bundler` and
+  `node16` resolution map `.mjs` imports to `.d.mts` and need an explicit extension inside ES modules.
+- Phase 2: `jsonix:output format="esm"` (default file names `${module.name}.mjs` /
+  `${module.name}.compact.mjs`). `ModuleCompiler.compileEsm` renders the same js-codemodel object
+  literal as the UMD output via `CodeWriter.expression`, so the mapping body is identical
+  (verified by normalised diff); the module contains only `export const <Mapping> = ...` lines.
+  `ModulesCompiler.compile(programWriter, textFileWriter)` routes ESM outputs to the text writer.
+- Not done: a flag widening date-like properties to accept `Date`, flattened names, `.ts` sources
+  (all rejected in "Decisions"); no typings for the `jsonix` runtime (out of scope).
+
+Verification:
+
+| Check | Result |
+|-------|--------|
+| `TypeScriptOutputTest` (compiler): golden `PurchaseOrder.d.ts`, re-export files, `.mjs` and `.d.mts`, `zero` schema coverage | green |
+| `tests/typescript`: `tsc --strict` over generated `PurchaseOrder.d.ts`/`.d.mts` and `usage.ts` (incl. three `@ts-expect-error` negatives, `.mjs` import under `bundler` resolution) | green |
+| `tests/typescript`: Node imports `PurchaseOrder.mjs`, unmarshals `po.xml` via `jsonix` 3.0.0; `TYPE_NAME`, numbers and calendar fields as declared | green |
+| Ad-hoc `tsc --strict` over declarations for `basic/zero` and OGC OWS 1.1.0 + XLink (cross-module imports, substitution groups, inheritance) | green |
+| Full suite on JDK 17 and 21 | green |
+
+## Follow-ups adopted from the runtime repository (jsonix-CR-001, item 6)
+
+The sibling `jsonix` repository implemented `docs/change-requests/jsonix-CR-001-typescript-consumers.md`
+(runtime 3.1.0: generic `unmarshalString<E>()` / `marshalString(E)` typings, an ES-module entry
+point, generated fixtures as a contract test). Its item 6 lists three follow-ups for this repository;
+they are adopted here, with the action taken for each.
+
+| Follow-up | Action taken (2026-09-06) |
+|-----------|---------------------------|
+| `tests/typescript` should depend on `@mitre/jsonix` at the version with the generic typings, not upstream `jsonix`, and `usage.ts` should drop the cast | Done. `tests/typescript/package.json` is now generated from `src/main/npm/package.json` with `"@mitre/jsonix": "${jsonix.runtime.dependency}"`. Because 3.1.0 is not on npm yet (latest published: 3.0.11), the property defaults to `file:../../../jsonix/nodejs/scripts` (the sibling checkout) and CI checks out `plutext/jsonix` next to the workspace and passes `-Djsonix.runtime.dependency=file:../../jsonix/nodejs/scripts`. Once 3.1.0 is published, change the default to `^3.1.0` and drop the CI checkout. `usage.ts` now imports `Jsonix` from `@mitre/jsonix`, calls `unmarshalString<PurchaseOrderElement>()` and `marshalString(outgoing)` with no casts, and asserts the generated `XmlCalendar`/`XmlQName` are assignable to `Jsonix.XML.Calendar`/`QName`; `esm-smoke.mjs` uses `import { Jsonix } from '@mitre/jsonix'` instead of `createRequire('jsonix')`. |
+| `JsonixMapping` could carry a phantom root-element type parameter so a future generic `Context` can infer the unmarshal result type | Done. `export interface JsonixMapping<R = unknown> { readonly __rootElement?: R; readonly [key: string]: unknown; }` and `export declare const PO: JsonixMapping<RootElement>` (plain `JsonixMapping` when a mapping has no global elements). The optional phantom member is what makes the parameter meaningful to TypeScript (an unused parameter would be erased structurally). The runtime side can infer it as `M extends { __rootElement?: infer R } ? R : unknown`; it is additive and the runtime's current `Mapping = object` accepts it. `usage.ts` checks `NonNullable<typeof PO.__rootElement>` is `RootElement`. **Consequence for the runtime repository:** its committed fixture `tests/typescript/PurchaseOrder.d.ts` differs from the compiler's golden file by these two lines until it is regenerated from this commit. |
+| The fork's npm package name (`npm/src/main/npm/package.json` still says `jsonix-schema-compiler`) | **Open, maintainer decision.** Recommendation: `@plutext/jsonix-schema-compiler`, mirroring the scoped `@mitre/jsonix` runtime; the upstream unscoped name cannot be published from this fork (see CR-001 "Publishing target" and `RELEASING.md`). Not changed here because it fixes the public install instructions in both repositories' READMEs at once. |

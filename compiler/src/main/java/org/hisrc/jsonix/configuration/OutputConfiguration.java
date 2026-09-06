@@ -8,6 +8,7 @@ import javax.xml.namespace.QName;
 import org.apache.commons.lang3.Validate;
 import org.hisrc.jsonix.configuration.exception.UnsupportedNamingException;
 import org.hisrc.jsonix.definition.Output;
+import org.hisrc.jsonix.definition.OutputFormat;
 import org.hisrc.jsonix.naming.CompactNaming;
 import org.hisrc.jsonix.naming.Naming;
 import org.hisrc.jsonix.naming.StandardNaming;
@@ -21,9 +22,14 @@ public class OutputConfiguration {
 			+ ".compact.js";
 	public static final String STANDARD_FILE_NAME_PATTERN = ModuleConfiguration.MODULE_NAME_PROPERTY
 			+ ".js";
+	public static final String COMPACT_ESM_FILE_NAME_PATTERN = ModuleConfiguration.MODULE_NAME_PROPERTY
+			+ ".compact.mjs";
+	public static final String STANDARD_ESM_FILE_NAME_PATTERN = ModuleConfiguration.MODULE_NAME_PROPERTY
+			+ ".mjs";
 
 	private String fileName;
 	private String naming;
+	private String format;
 	public static final QName OUTPUT_NAME = new QName(
 			ModulesConfiguration.NAMESPACE_URI, LOCAL_ELEMENT_NAME,
 			ModulesConfiguration.DEFAULT_PREFIX);
@@ -61,18 +67,30 @@ public class OutputConfiguration {
 		this.naming = naming;
 	}
 
+	/** {@code umd} (default) or {@code esm}; see {@link OutputFormat}. */
+	@XmlAttribute(name = "format")
+	public String getFormat() {
+		return format;
+	}
+
+	public void setFormat(String format) {
+		this.format = format;
+	}
+
 	public Output build(String moduleName) {
 		Validate.notNull(moduleName);
 		final Naming naming;
 		final String defaultFileNamePattern;
+		final OutputFormat outputFormat = OutputFormat.fromName(this.format);
+		final boolean esm = outputFormat == OutputFormat.ESM;
 		// TODO move this to enum?
 		if (null == this.naming
 				|| StandardNaming.NAMING_NAME.equals(this.naming)) {
 			naming = StandardNaming.INSTANCE;
-			defaultFileNamePattern = STANDARD_FILE_NAME_PATTERN;
+			defaultFileNamePattern = esm ? STANDARD_ESM_FILE_NAME_PATTERN : STANDARD_FILE_NAME_PATTERN;
 		} else if (CompactNaming.NAMING_NAME.equals(this.naming)) {
 			naming = CompactNaming.INSTANCE;
-			defaultFileNamePattern = COMPACT_FILE_NAME_PATTERN;
+			defaultFileNamePattern = esm ? COMPACT_ESM_FILE_NAME_PATTERN : COMPACT_FILE_NAME_PATTERN;
 		} else {
 			throw new UnsupportedNamingException(this.naming);
 		}
@@ -80,6 +98,6 @@ public class OutputConfiguration {
 				: this.fileName;
 		final String fileName = fileNamePattern.replace(
 				ModuleConfiguration.MODULE_NAME_PROPERTY, moduleName);
-		return new Output(fileName, naming);
+		return new Output(fileName, naming, outputFormat);
 	}
 }

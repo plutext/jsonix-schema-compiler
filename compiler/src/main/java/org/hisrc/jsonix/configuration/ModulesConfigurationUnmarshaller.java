@@ -69,7 +69,8 @@ public class ModulesConfigurationUnmarshaller {
 					ExcludesConfiguration.class, TypeInfoConfiguration.class,
 					ElementInfoConfiguration.class,
 					PropertyInfoConfiguration.class,
-					DependenciesOfMappingConfiguration.class);
+					DependenciesOfMappingConfiguration.class,
+					TypeScriptConfiguration.class);
 		} catch (JAXBException jaxbex) {
 			throw new ExceptionInInitializerError(jaxbex);
 		}
@@ -85,6 +86,7 @@ public class ModulesConfigurationUnmarshaller {
 					MappingConfiguration.LOCAL_ELEMENT_NAME,
 					OutputConfiguration.LOCAL_ELEMENT_NAME,
 					JsonSchemaConfiguration.LOCAL_ELEMENT_NAME,
+					TypeScriptConfiguration.LOCAL_ELEMENT_NAME,
 					IncludesConfiguration.LOCAL_ELEMENT_NAME,
 					ExcludesConfiguration.LOCAL_ELEMENT_NAME,
 					DependenciesOfMappingConfiguration.LOCAL_ELEMENT_NAME,
@@ -118,6 +120,14 @@ public class ModulesConfigurationUnmarshaller {
 	public ModulesConfiguration unmarshal(Model model,
 			OutputConfiguration defaultOutputConfiguration,
 			JsonSchemaConfiguration defaultJsonSchemaConfiguration) {
+		return unmarshal(model, defaultOutputConfiguration,
+				defaultJsonSchemaConfiguration, null);
+	}
+
+	public ModulesConfiguration unmarshal(Model model,
+			OutputConfiguration defaultOutputConfiguration,
+			JsonSchemaConfiguration defaultJsonSchemaConfiguration,
+			TypeScriptConfiguration defaultTypeScriptConfiguration) {
 		Validate.notNull(model);
 		Validate.notNull(defaultOutputConfiguration);
 		final ModulesConfiguration modulesConfiguration = new ModulesConfiguration();
@@ -157,6 +167,19 @@ public class ModulesConfigurationUnmarshaller {
 				&& defaultJsonSchemaConfiguration != null) {
 			modulesConfiguration.getJsonSchemaConfigurations().add(
 					defaultJsonSchemaConfiguration);
+		}
+
+		for (CPluginCustomization customization : CustomizationUtils
+				.findCustomizations(model,
+						TypeScriptConfiguration.TYPE_SCRIPT_NAME)) {
+			modulesConfiguration.getTypeScriptConfigurations().add(
+					this.<TypeScriptConfiguration> unmarshal(customization,
+							"TypeScript configuration"));
+		}
+		if (modulesConfiguration.getTypeScriptConfigurations().isEmpty()
+				&& defaultTypeScriptConfiguration != null) {
+			modulesConfiguration.getTypeScriptConfigurations().add(
+					defaultTypeScriptConfiguration);
 		}
 		return modulesConfiguration;
 	}

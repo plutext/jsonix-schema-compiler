@@ -109,3 +109,72 @@ See [Ant Usage](https://github.com/highsource/jsonix-schema-compiler/wiki/Ant-Us
 ```
 
 See [Maven Usage](https://github.com/highsource/jsonix-schema-compiler/wiki/Maven-Usage).
+
+## TypeScript
+
+Add `-generateTypeScript` (`-Xjsonix-generateTypeScript` with XJC/Maven/Ant) to get, next to each
+module's mapping file, a declaration file describing the objects Jsonix unmarshals and marshals:
+
+```
+java -jar jsonix-schema-compiler-full.jar -generateTypeScript schema.xsd -b bindings.xjb
+```
+
+For the purchase order sample this produces `PurchaseOrder.d.ts` (plus one-line
+`PurchaseOrder.std.d.ts` / `PurchaseOrder.cmp.d.ts` re-exports so imports of the mapping files resolve):
+
+```ts
+export interface USAddress {
+  TYPE_NAME?: 'PO.USAddress';
+  name: string; street: string; city: string; state: string; zip: number;
+  country?: string;
+}
+export interface PurchaseOrderType {
+  TYPE_NAME?: 'PO.PurchaseOrderType';
+  shipTo: USAddress; billTo: USAddress; comment?: string; items: Items; orderDate?: XmlCalendar;
+}
+export type PurchaseOrderElement = TypedNamedValue<PurchaseOrderType>;
+export type RootElement = CommentElement | PurchaseOrderElement;
+export declare const PO: JsonixMapping<RootElement>;
+```
+
+```ts
+import type { PurchaseOrderElement } from './PurchaseOrder.std';
+const po = (unmarshaller.unmarshalString(xml) as PurchaseOrderElement).value;
+po.shipTo.name;   // string
+po.orderDate?.year; // number | undefined (dates are Jsonix calendars, not JS Dates)
+```
+
+- Required properties are non-optional, collections are arrays, choices are unions, `elementRef`
+  properties are `TypedNamedValue<T>` unions (with `string` when mixed), enums are literal unions,
+  and `TYPE_NAME` is a literal union over the type and its subtypes, usable as a discriminant.
+- Cross-module references become `import type * as ... from './<other module>'`.
+- Customise the file name with `<jsonix:typeScript fileName="${module.name}.d.ts"/>` inside
+  `jsonix:module` (or at the top level of the bindings). One file per module; naming
+  (standard/compact) does not affect it.
+
+To emit the mapping itself as an ES module instead of the UMD wrapper (for bundlers, Angular, Vite):
+
+```xml
+<jsonix:module name="PurchaseOrder">
+  <jsonix:mapping name="PO" package="org.hisrc.jsonix.demos.po"/>
+  <jsonix:output naming="standard" format="esm"/>   <!-- PurchaseOrder.mjs, plus PurchaseOrder.d.mts -->
+</jsonix:module>
+```
+
+```js
+import { PO } from './PurchaseOrder.mjs';
+const context = new Jsonix.Context([PO]);
+```
+
+Generated declarations are self-contained. With the `@mitre/jsonix` runtime 3.1.0 or newer, whose
+typings are generic, no cast is needed at all:
+
+```ts
+import { Jsonix } from '@mitre/jsonix';
+import { PO } from './PurchaseOrder.mjs';
+import type { PurchaseOrderElement } from './PurchaseOrder.mjs';
+const po = new Jsonix.Context([PO]).createUnmarshaller().unmarshalString<PurchaseOrderElement>(xml).value;
+```
+
+`JsonixMapping<RootElement>` carries the mapping's root element union as a phantom type parameter
+(`__rootElement`), so a runtime can infer the result type from the mappings passed to `Jsonix.Context`.

@@ -11,12 +11,23 @@ public class Output {
 	private final String directory = "";
 	private final String fileName;
 	private final Naming naming;
+	private final OutputFormat format;
 
 	public Output(final String fileName, final Naming naming) {
+		this(fileName, naming, OutputFormat.UMD);
+	}
+
+	public Output(final String fileName, final Naming naming, final OutputFormat format) {
 		Validate.notNull(fileName);
 		Validate.notNull(naming);
+		Validate.notNull(format);
 		this.fileName = fileName;
 		this.naming = naming;
+		this.format = format;
+	}
+
+	public OutputFormat getFormat() {
+		return this.format;
 	}
 
 	public String getOutputPackageName() {

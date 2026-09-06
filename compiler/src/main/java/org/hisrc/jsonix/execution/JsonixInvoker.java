@@ -4,6 +4,9 @@ import org.hisrc.jsonix.compilation.jsonschema.JsonSchemaModulesGenerator;
 import org.hisrc.jsonix.compilation.jsonschema.JsonStructureWriter;
 import org.hisrc.jsonix.compilation.mapping.ModulesCompiler;
 import org.hisrc.jsonix.compilation.mapping.ProgramWriter;
+import org.hisrc.jsonix.compilation.typescript.TextFileWriter;
+import org.hisrc.jsonix.compilation.typescript.TypeScriptModulesGenerator;
+import org.hisrc.jsonix.configuration.TypeScriptConfiguration;
 import org.hisrc.jsonix.configuration.JsonSchemaConfiguration;
 import org.hisrc.jsonix.configuration.ModulesConfiguration;
 import org.hisrc.jsonix.configuration.ModulesConfigurationUnmarshaller;
@@ -24,6 +27,13 @@ public class JsonixInvoker {
 	public void execute(Settings settings, Model model,
 			ProgramWriter<NType, NClass> programWriter,
 			JsonStructureWriter<NType, NClass> jsonStructureWriter) {
+		execute(settings, model, programWriter, jsonStructureWriter, null);
+	}
+
+	public void execute(Settings settings, Model model,
+			ProgramWriter<NType, NClass> programWriter,
+			JsonStructureWriter<NType, NClass> jsonStructureWriter,
+			TextFileWriter<NType, NClass> textFileWriter) {
 
 		final DefaultJsonixContext context = new DefaultJsonixContext();
 
@@ -48,9 +58,14 @@ public class JsonixInvoker {
 				.isGenerateJsonSchema() ? new JsonSchemaConfiguration(
 				JsonSchemaConfiguration.STANDARD_FILE_NAME_PATTERN) : null;
 
+		final TypeScriptConfiguration defaultTypeScriptConfiguration = settings
+				.isGenerateTypeScript() ? new TypeScriptConfiguration(
+				TypeScriptConfiguration.STANDARD_FILE_NAME_PATTERN) : null;
+
 		final ModulesConfiguration modulesConfiguration = customizationHandler
 				.unmarshal(model, defaultOutputConfiguration,
-						defaultJsonSchemaConfiguration);
+						defaultJsonSchemaConfiguration,
+						defaultTypeScriptConfiguration);
 
 		final MModelInfo<NType, NClass> modelinfo = new XJCCMInfoFactory(model)
 				.createModel();
@@ -61,10 +76,17 @@ public class JsonixInvoker {
 		final ModulesCompiler<NType, NClass> modulesCompiler = new ModulesCompiler<NType, NClass>(
 				modules);
 
-		modulesCompiler.compile(programWriter);
+		modulesCompiler.compile(programWriter, textFileWriter);
 
 		final JsonSchemaModulesGenerator<NType, NClass> jsonSchemaModulesGenerator = new JsonSchemaModulesGenerator<NType, NClass>(
 				modules);
 		jsonSchemaModulesGenerator.generate(jsonStructureWriter);
+
+		if (textFileWriter != null) {
+			new TypeScriptModulesGenerator<NType, NClass>(modules)
+					.generate(textFileWriter);
+		} else {
+			logger.warn("No text file writer was provided, TypeScript declarations (if configured) will not be generated.");
+		}
 	}
 }

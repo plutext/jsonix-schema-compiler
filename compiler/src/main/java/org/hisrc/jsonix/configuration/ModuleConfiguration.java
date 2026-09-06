@@ -13,6 +13,7 @@ import javax.xml.namespace.QName;
 
 import org.hisrc.jsonix.analysis.ModelInfoGraphAnalyzer;
 import org.hisrc.jsonix.definition.JsonSchema;
+import org.hisrc.jsonix.definition.TypeScript;
 import org.hisrc.jsonix.definition.Mapping;
 import org.hisrc.jsonix.definition.Module;
 import org.hisrc.jsonix.definition.Output;
@@ -35,6 +36,7 @@ public class ModuleConfiguration {
 	private List<MappingConfiguration> mappingConfigurations = new LinkedList<MappingConfiguration>();
 	private List<OutputConfiguration> outputConfigurations = new LinkedList<OutputConfiguration>();
 	private List<JsonSchemaConfiguration> jsonSchemaConfigurations = new LinkedList<JsonSchemaConfiguration>();
+	private List<TypeScriptConfiguration> typeScriptConfigurations = new LinkedList<TypeScriptConfiguration>();
 
 	public static final QName MODULE_NAME = new QName(
 			ModulesConfiguration.NAMESPACE_URI, LOCAL_ELEMENT_NAME,
@@ -88,6 +90,16 @@ public class ModuleConfiguration {
 		this.jsonSchemaConfigurations = jsonSchemaConfigurations;
 	}
 
+	@XmlElement(name = TypeScriptConfiguration.LOCAL_ELEMENT_NAME)
+	public List<TypeScriptConfiguration> getTypeScriptConfigurations() {
+		return typeScriptConfigurations;
+	}
+
+	public void setTypeScriptConfigurations(
+			List<TypeScriptConfiguration> typeScriptConfigurations) {
+		this.typeScriptConfigurations = typeScriptConfigurations;
+	}
+
 	public <T, C extends T> Module<T, C> build(
 			ModelInfoGraphAnalyzer<T, C> analyzer, MModelInfo<T, C> modelInfo,
 			Map<String, Mapping<T, C>> mappings) {
@@ -137,8 +149,17 @@ public class ModuleConfiguration {
 				jsonSchemas.add(jsonSchema);
 			}
 		}
+		final List<TypeScript> typeScripts = new ArrayList<TypeScript>(
+				this.typeScriptConfigurations.size());
+		for (TypeScriptConfiguration typeScriptConfiguration : this.typeScriptConfigurations) {
+			final TypeScript typeScript = typeScriptConfiguration
+					.build(moduleName);
+			if (typeScript != null) {
+				typeScripts.add(typeScript);
+			}
+		}
 		return new Module<T, C>(moduleName, moduleSchemaId, moduleMappings,
-				outputs, jsonSchemas);
+				outputs, jsonSchemas, typeScripts);
 	}
 
 //	private <T, C extends T> String createModuleName(

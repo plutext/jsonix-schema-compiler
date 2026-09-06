@@ -1,0 +1,19 @@
+{
+  "compilerOptions": {
+    "strict": true,
+    "noEmit": true,
+    "target": "es2019",
+    "module": "esnext",
+    "moduleResolution": "bundler",
+    "lib": ["es2019", "dom"],
+    "types": [],
+    "skipLibCheck": false
+  },
+  "files": [
+    "target/generated-sources/xjc/PurchaseOrder.d.ts",
+    "target/generated-sources/xjc/PurchaseOrder.std.d.ts",
+    "target/generated-sources/xjc/PurchaseOrder.cmp.d.ts",
+    "target/generated-sources/xjc/PurchaseOrder.d.mts",
+    "src/test/typescript/usage.ts"
+  ]
+}

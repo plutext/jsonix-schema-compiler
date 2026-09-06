@@ -12,19 +12,27 @@ public class Module<T, C extends T> {
 	private final List<Mapping<T, C>> mappings;
 	private final List<Output> outputs;
 	private final List<JsonSchema> jsonSchemas;
+	private final List<TypeScript> typeScripts;
 
 	public Module(String name, String schemaId, List<Mapping<T, C>> mappings,
 			List<Output> outputs, List<JsonSchema> jsonSchemas) {
+		this(name, schemaId, mappings, outputs, jsonSchemas, java.util.Collections.<TypeScript> emptyList());
+	}
+
+	public Module(String name, String schemaId, List<Mapping<T, C>> mappings,
+			List<Output> outputs, List<JsonSchema> jsonSchemas, List<TypeScript> typeScripts) {
 		Validate.notNull(name);
 		Validate.notNull(schemaId);
 		Validate.noNullElements(mappings);
 		Validate.noNullElements(outputs);
 		Validate.noNullElements(jsonSchemas);
+		Validate.noNullElements(typeScripts);
 		this.name = name;
 		this.schemaId = schemaId;
 		this.mappings = mappings;
 		this.outputs = outputs;
 		this.jsonSchemas = jsonSchemas;
+		this.typeScripts = typeScripts;
 	}
 
 	public boolean isEmpty() {
@@ -54,6 +62,10 @@ public class Module<T, C extends T> {
 
 	public List<JsonSchema> getJsonSchemas() {
 		return jsonSchemas;
+	}
+
+	public List<TypeScript> getTypeScripts() {
+		return typeScripts;
 	}
 
 	@Override

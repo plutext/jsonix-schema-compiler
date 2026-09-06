@@ -8,6 +8,7 @@ import org.apache.commons.lang3.Validate;
 import org.hisrc.jsonix.args4j.PartialCmdLineParser;
 import org.hisrc.jsonix.compilation.jsonschema.JsonStructureWriter;
 import org.hisrc.jsonix.compilation.mapping.ProgramWriter;
+import org.hisrc.jsonix.compilation.typescript.TextFileWriter;
 import org.hisrc.jsonix.execution.JsonixInvoker;
 import org.hisrc.jsonix.settings.Settings;
 import org.hisrc.jsonix.xjc.plugin.JsonixPlugin;
@@ -107,8 +108,11 @@ public class JsonixMain {
 		final JsonStructureWriter<NType, NClass> jsonStructureWriter = new TargetDirectoryJsonStructureWriter(
 				targetDirectory, errorHandler);
 
+		final TextFileWriter<NType, NClass> textFileWriter = new TargetDirectoryTextFileWriter(
+				targetDirectory, errorHandler);
+
 		new JsonixInvoker().execute(settings, model, programWriter,
-				jsonStructureWriter);
+				jsonStructureWriter, textFileWriter);
 
 	}
 

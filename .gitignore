@@ -2,3 +2,5 @@
 .project
 .settings/
 
+# sibling runtime checkout used by CI for tests/typescript (jsonix-CR-001 item 6)
+/jsonix/

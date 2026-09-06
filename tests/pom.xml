@@ -13,6 +13,7 @@
 		<module>wps</module>
 		<module>zero</module>
 		<module>issues</module>
+		<module>typescript</module>
 	</modules>
 	<build>
 		<pluginManagement>

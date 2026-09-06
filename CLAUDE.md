@@ -21,7 +21,12 @@ export JAVA_HOME=/usr/lib/jvm/java-17-openjdk
 Use the wrapper (`./mvnw`, pinned to Maven 3.9.16). All plugin versions are pinned in the root pom's
 `pluginManagement`. The `npm` module invokes `npm install` during `compile`, so `npm` must be on the
 PATH for a full build (or exclude it with `-pl '!npm'`); it also drops `lib/`, `node_modules/` and
-`package-lock.json` into `npm/`, which are not tracked.
+`package-lock.json` into `npm/`, which are not tracked. `tests/typescript` (profile `tests`) also needs
+`node`/`npm` (it runs `tsc` and a Node smoke test) and the `@mitre/jsonix` runtime 3.1.0+, which is
+not on npm yet: its `package.json` is generated from `src/main/npm/package.json` with the dependency
+taken from `-Djsonix.runtime.dependency` (default `file:../../../jsonix/nodejs/scripts`, i.e. the
+sibling `plutext/jsonix` checkout next to this repository; CI checks it out into `jsonix/`). Skip the
+module with `-Dskip.typescript=true`.
 
 Generated output order is deterministic (CR-003): `definition.Mapping` returns class/enum infos sorted
 by scoped local name and element infos by (namespace, local part, scope) via `InfoComparators`, so
@@ -55,7 +60,7 @@ Run the standalone CLI from the built shaded jar (exercises the same code path a
 
 ```
 java -jar full/target/jsonix-schema-compiler-full-<version>.jar \
-  [-compact] [-generateJsonSchema] [-logLevel TRACE] [-d outdir] schema.xsd [-b bindings.xjb]
+  [-compact] [-generateJsonSchema] [-generateTypeScript] [-logLevel TRACE] [-d outdir] schema.xsd [-b bindings.xjb]
 ```
 
 Compiler tests write generated output under `compiler/target/generated-sources/...`; inspect the `.js` / `.jsonschema` files there when debugging generation.
@@ -68,7 +73,7 @@ Migration proposals (Java 11, JAXB 2.3, deterministic output, Jakarta) live in `
 - `plugin/` — shaded jar of `compiler` (for the Ant/xjc classpath). Contains only a `Dummy` class.
 - `full/` — shaded executable jar bundling XJC, the JAXB 4 runtime, the Jakarta APIs and slf4j-simple. Adds `JsonixMain` (CLI entry point) and the `TargetDirectory*Writer` classes that write files to disk.
 - `npm/` — wraps the `full` jar as `lib/jsonix-schema-compiler-full.jar`. `npm/package.json` is *generated* by resource filtering from `npm/src/main/npm/package.json`; edit the latter.
-- `tests/` (profile `tests`) — integration tests driven by `org.jvnet.jaxb:jaxb-maven-plugin` 4.0.16: `zero`, `filter`, `wps`, and `issues` (GitHub issue regressions). `tests/zero` uses the 2010-era `legato-testing` JsUnit runner and needs `--add-opens java.base/java.net` (set in its surefire config).
+- `tests/` (profile `tests`) — integration tests driven by `org.jvnet.jaxb:jaxb-maven-plugin` 4.0.16: `zero`, `filter`, `wps`, `issues` (GitHub issue regressions) and `typescript` (generates declarations and an ES module for the purchase order schema, type-checks them with `tsc` against `src/test/typescript/usage.ts`, and unmarshals `po.xml` through the Jsonix npm runtime from the `.mjs` mapping). `tests/zero` uses the 2010-era `legato-testing` JsUnit runner and needs `--add-opens java.base/java.net` (set in its surefire config).
 - `samples/po` (profile `samples`), `dist/` (profile `dist`), `demos/po-npm` (not built by Maven).
 
 ## Compilation pipeline (compiler module)
@@ -81,10 +86,12 @@ Both entry points (`JsonixPlugin.run` inside XJC, `JsonixMain` standalone) end u
 4. **Analysis** (`analysis.*`). `ModelInfoGraphAnalyzer` builds a JGraphT dependency graph over package/type/property/element vertices. `ModulesConfiguration.build` uses it to resolve includes/excludes and inter-mapping dependencies, producing the immutable `definition.*` objects (`Modules` → `Module` → `Mapping`, plus `Output` and `JsonSchema`). `Modules` enforces that a package is mapped under one mapping name and one schema id.
 5. **Mapping compilation** (`compilation.mapping.*`). `ModulesCompiler` → `ModuleCompiler` (emits the UMD-style module wrapper: AMD `define`, `module.exports`, or globals) → `MappingCompiler` → `typeinfo.*Compiler` classes, all building JS via `org.hisrc.jscm` js-codemodel. One `JSProgram` per (module, output) is handed to a `ProgramWriter` (`CodeModelProgramWriter` writes into XJC's `JCodeModel` as a resource; `TargetDirectoryProgramWriter` in `full` writes files).
 6. **JSON Schema generation** (`compilation.jsonschema.*`), mirroring step 5: `JsonSchemaModulesGenerator` → `JsonSchemaModuleCompiler` → `JsonSchemaMappingCompiler` → `typeinfo.*Producer`, building `javax.json` structures via `jsonschema.JsonSchemaBuilder` and handing them to a `JsonStructureWriter`.
+7. **TypeScript declarations** (`compilation.typescript.*`, CR-005), enabled by `-generateTypeScript` or `jsonix:typeScript`: `TypeScriptModulesGenerator` → `TypeScriptModuleCompiler` (support types, cross-module `import type`, `TYPE_NAME` unions over subtypes, re-export files per output) → `TypeScriptMappingCompiler` (interfaces, enum literal unions, element aliases, `RootElement`) with `CreateTsTypeVisitor` (type info → TS type, resolving builtin XSD types through the property's schema component like the mapping compiler does) and `TsPropertyVisitor` (property kind → member). Declarations are plain strings assembled in a `TsNode` namespace tree; there is no TypeScript code model. Output goes through `TextFileWriter` (`CodeModelTextFileWriter` in XJC, `TargetDirectoryTextFileWriter` in `full`). The same writer serves `jsonix:output format="esm"`, for which `ModuleCompiler.compileEsm` renders the mapping literal as `export const <Mapping> = {...};`.
 
 Practical consequences:
 
 - Built-in XSD types have **two** parallel implementations, `compilation/mapping/typeinfo/builtin/*TypeInfoCompiler` and `compilation/jsonschema/typeinfo/builtin/*TypeInfoProducer`, dispatched from `CreateTypeInfoCompiler` / `CreateTypeInfoProducer`. Changes to type handling usually need both.
+- The TypeScript generator's golden file lives at `compiler/src/test/resources/typescript/po/PurchaseOrder.d.ts`; regenerate it from the compiler output when the emitted format changes deliberately. The sibling runtime repository (`../jsonix`, `docs/change-requests/jsonix-CR-001-typescript-consumers.md`) commits the same generated files as a contract test and must regenerate them after such a change.
 - Property names in generated mappings come from `naming.Naming` (`StandardNaming` vs `CompactNaming`); the naming is chosen per `Output`, so one module can emit both `.std.js` and `.cmp.js` (see `samples/po/src/main/resources/bindings.xjb`).
 - Logging goes through `context.JsonixContext`, whose `slf4j.Levelled*` wrappers apply `-logLevel` regardless of the SLF4J binding present. `compiler` only has `slf4j-simple` at test scope; `full` ships `simplelogger.properties`.
 

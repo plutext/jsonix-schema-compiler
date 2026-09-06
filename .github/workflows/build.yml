@@ -15,23 +15,34 @@ jobs:
         java: ["11", "17", "21"]
     steps:
       - uses: actions/checkout@v4
+      # The @mitre/jsonix runtime (3.1.0+, generic typings) is not on npm yet; tests/typescript
+      # type-checks against the sibling repository checkout (jsonix-CR-001 item 6).
+      - uses: actions/checkout@v4
+        with:
+          repository: plutext/jsonix
+          path: jsonix
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
       - uses: actions/setup-java@v4
         with:
           distribution: temurin
           java-version: ${{ matrix.java }}
           cache: maven
       - name: Build and run unit + integration tests (npm module excluded)
-        run: ./mvnw -B -ntp clean install -Ptests -pl '!npm'
+        run: ./mvnw -B -ntp clean install -Ptests -pl '!npm' -Djsonix.runtime.dependency=file:../../jsonix/nodejs/scripts
       - name: Smoke-test the CLI jar against the purchase-order sample
         run: |
           mkdir -p target/smoke
           java -jar full/target/jsonix-schema-compiler-full-*.jar \
-            -d target/smoke -generateJsonSchema \
+            -d target/smoke -generateJsonSchema -generateTypeScript \
             samples/po/src/main/resources/purchaseorder.xsd \
             -b samples/po/src/main/resources/bindings.xjb
           test -s target/smoke/PurchaseOrder.std.js
           test -s target/smoke/PurchaseOrder.cmp.js
           test -s target/smoke/PurchaseOrder.jsonschema
+          test -s target/smoke/PurchaseOrder.d.ts
+          test -s target/smoke/PurchaseOrder.std.d.ts
       - name: Verify no system-scoped dependencies of our own
         run: |
           ./mvnw -B -q -ntp -Ptests -pl '!npm' dependency:tree -DoutputFile=target/tree.txt -DappendOutput=true

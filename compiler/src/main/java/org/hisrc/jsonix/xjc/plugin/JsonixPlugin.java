@@ -39,6 +39,7 @@ import java.util.List;
 import org.hisrc.jsonix.args4j.PartialCmdLineParser;
 import org.hisrc.jsonix.compilation.jsonschema.JsonStructureWriter;
 import org.hisrc.jsonix.compilation.mapping.ProgramWriter;
+import org.hisrc.jsonix.compilation.typescript.TextFileWriter;
 import org.hisrc.jsonix.configuration.PluginCustomizations;
 import org.hisrc.jsonix.execution.JsonixInvoker;
 import org.hisrc.jsonix.settings.Settings;
@@ -140,8 +141,11 @@ public class JsonixPlugin extends Plugin {
 		final JsonStructureWriter<NType, NClass> jsonStructureWriter = new CodeModelJsonStructureWriter(
 				codeModel, errorHandler);
 
+		final TextFileWriter<NType, NClass> textFileWriter = new CodeModelTextFileWriter(
+				codeModel, errorHandler);
+
 		new JsonixInvoker().execute(getSettings(), model, programWriter,
-				jsonStructureWriter);
+				jsonStructureWriter, textFileWriter);
 
 		return true;
 	}

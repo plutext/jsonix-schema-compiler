@@ -1,0 +1,5 @@
+org/hisrc/jsonix/demos/po/USAddress.class
+org/hisrc/jsonix/demos/po/PurchaseOrderType.class
+org/hisrc/jsonix/demos/po/Items.class
+org/hisrc/jsonix/demos/po/ObjectFactory.class
+org/hisrc/jsonix/demos/po/Items$Item.class
