@@ -1,6 +1,6 @@
 # CR-009: Split `OfficeOpenXML/` into `plutext/docx4j-ts` as `@docx4j/docx4j-ts`
 
-**Status:** Draft (2026-09-07)
+**Status:** Implemented 2026-09-07 (repository created locally; push pending)
 **Depends on:** CR-007 (current state of `OfficeOpenXML/`), CR-008 (npm identity), runtime
 `@docx4j/jsonix` 3.2.0 on npm (otherwise the package cannot declare its dependency by version)
 
@@ -132,3 +132,26 @@ Design points:
 ## Effort
 
 Split and repository setup: two hours. Facade, `exports`, tests, CI: one day.
+
+## Implementation notes (2026-09-07)
+
+- History split with `git subtree split --prefix=OfficeOpenXML` (four commits, `972fa18` to
+  `ba24587`) into `../docx4j-ts`, `main`, remote `https://github.com/plutext/docx4j-ts.git`
+  (the GitHub repository must be created from the account, `gh` is not installed here; then
+  `git push -u origin main`).
+- Scaffold committed there (`4450673`): `package.json` (`@docx4j/docx4j-ts` 0.1.0, `"type":
+  "module"`, `exports` root / `./helpers/wml` / `./modules/*`, dependency `@docx4j/jsonix ^3.2.0`),
+  `index.mts` facade as sketched (`MODULE_NAMES` generated from the directory, `getContext` lazy
+  with `parentPointers: true`, `resetContext`, `unmarshalString`, `marshalString`, `unwrap`,
+  `deepCopy`, `Jsonix` re-export), `tsconfig.json` / `tsconfig.build.json` (`lib` includes `dom`
+  because the runtime typings reference `Node` and `Document`), `test/smoke.mjs` over a small
+  hand-written WordprocessingML document (parent pointers, `deepCopy` with the copy's own `PARENT`
+  unset, marshal round trip, `v:line` order), a Node 18/20/22 workflow, `generate.md`, README.
+  Verified: `npm run typecheck` and the smoke pass with the runtime installed from the sibling
+  checkout (`npm install --no-save ../jsonix/nodejs/scripts`, until 3.2.0 is on npm).
+- Compiler side: `OfficeOpenXML/` reduced to `bindings.xjb`, `generate.sh` (target directory
+  argument, default `../docx4j-ts`) and a pointer README; regeneration into `../docx4j-ts`
+  reproduces the committed files with an empty diff. The ad-hoc `tsc`/Node checks over the
+  generated files now live in `docx4j-ts` as `npm run typecheck` / `npm test`.
+- Decisions taken as recommended: package name `@docx4j/docx4j-ts`; no per-module packages;
+  `parentPointers` on by default in the facade.
