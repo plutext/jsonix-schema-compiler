@@ -263,3 +263,17 @@ they are adopted here, with the action taken for each.
 | `tests/typescript` should depend on `@docx4j/jsonix` at the version with the generic typings, not upstream `jsonix`, and `usage.ts` should drop the cast | Done. `tests/typescript/package.json` is now generated from `src/main/npm/package.json` with `"@docx4j/jsonix": "${jsonix.runtime.dependency}"`. Because 3.1.0 is not on npm yet (latest published: 3.0.11), the property defaults to `file:../../../jsonix/nodejs/scripts` (the sibling checkout) and CI checks out `plutext/jsonix` next to the workspace and passes `-Djsonix.runtime.dependency=file:../../jsonix/nodejs/scripts`. Once 3.1.0 is published, change the default to `^3.1.0` and drop the CI checkout. `usage.ts` now imports `Jsonix` from `@docx4j/jsonix`, calls `unmarshalString<PurchaseOrderElement>()` and `marshalString(outgoing)` with no casts, and asserts the generated `XmlCalendar`/`XmlQName` are assignable to `Jsonix.XML.Calendar`/`QName`; `esm-smoke.mjs` uses `import { Jsonix } from '@docx4j/jsonix'` instead of `createRequire('jsonix')`. |
 | `JsonixMapping` could carry a phantom root-element type parameter so a future generic `Context` can infer the unmarshal result type | Done. `export interface JsonixMapping<R = unknown> { readonly __rootElement?: R; readonly [key: string]: unknown; }` and `export declare const PO: JsonixMapping<RootElement>` (plain `JsonixMapping` when a mapping has no global elements). The optional phantom member is what makes the parameter meaningful to TypeScript (an unused parameter would be erased structurally). The runtime side can infer it as `M extends { __rootElement?: infer R } ? R : unknown`; it is additive and the runtime's current `Mapping = object` accepts it. `usage.ts` checks `NonNullable<typeof PO.__rootElement>` is `RootElement`. **Consequence for the runtime repository:** its committed fixture `tests/typescript/PurchaseOrder.d.ts` differs from the compiler's golden file by these two lines until it is regenerated from this commit. |
 | The fork's npm package name (`npm/src/main/npm/package.json` still says `jsonix-schema-compiler`) | **Open, maintainer decision.** Recommendation: `@plutext/jsonix-schema-compiler`, mirroring the scoped `@docx4j/jsonix` runtime; the upstream unscoped name cannot be published from this fork (see CR-001 "Publishing target" and `RELEASING.md`). Not changed here because it fixes the public install instructions in both repositories' READMEs at once. |
+
+## Addendum (2026-09-07): effective multiplicity
+
+"Required iff `minOccurs` is not 0" looked at the property's particle alone, so a branch of a
+choice (`pkg:part`'s `xmlData` / `binaryData`), an element inside a `minOccurs="0"` sequence, and
+an optional element inside a repeating sequence were declared required, and the mapping said
+`required: true` for them (upstream behaviour). `xml.xsom.EffectiveMultiplicity` now walks from the
+class's content model down to the property's particle, multiplying the enclosing groups'
+occurrences and treating a multi-branch choice as minimum 0 for each branch, then applies the
+particle's own content multiplicity (a repeating group becomes one collection property whose
+origin is the group). Both the mapping (`required`, `minOccurs`, `maxOccurs`) and the
+declarations use it; it falls back to the old counter when the schema component is unavailable.
+On the docx4j set 533 members became optional and none became required. Test:
+`JsonixPluginMultiplicityTest`.

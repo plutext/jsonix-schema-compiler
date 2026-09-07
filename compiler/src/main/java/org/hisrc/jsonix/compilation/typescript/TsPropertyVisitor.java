@@ -7,6 +7,7 @@ import java.util.List;
 import javax.xml.namespace.QName;
 
 import org.apache.commons.lang3.Validate;
+import org.hisrc.jsonix.xml.xsom.EffectiveMultiplicity;
 import org.hisrc.jsonix.xml.xsom.ParticleMultiplicityCounter;
 import org.hisrc.xml.xsom.XSFunctionApplier;
 import org.jvnet.jaxb.xml.bind.model.MAnyAttributePropertyInfo;
@@ -44,9 +45,16 @@ public class TsPropertyVisitor<T, C extends T> implements MPropertyInfoVisitor<T
 		this.types = new CreateTsTypeVisitor<T, C>(moduleCompiler);
 	}
 
-	/** Same rule as the mapping compiler: required iff minOccurs is not 0. */
+	/**
+	 * Same rule as the mapping compiler: required iff the effective minimum
+	 * occurrence (within the class's content model, see
+	 * {@link EffectiveMultiplicity}) is not 0.
+	 */
 	private boolean isRequired(MPropertyInfo<T, C> propertyInfo) {
-		final Multiplicity multiplicity = multiplicityCounter.apply(propertyInfo.getOrigin());
+		Multiplicity multiplicity = EffectiveMultiplicity.of(propertyInfo);
+		if (multiplicity == null) {
+			multiplicity = multiplicityCounter.apply(propertyInfo.getOrigin());
+		}
 		return multiplicity != null && multiplicity.min != null && !BigInteger.ZERO.equals(multiplicity.min);
 	}
 

@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Effective multiplicity: a property is required only if every enclosing group requires it. -->
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
+	xmlns:jaxb="https://jakarta.ee/xml/ns/jaxb" jaxb:version="3.0"
+	targetNamespace="urn:test:multiplicity" xmlns="urn:test:multiplicity" elementFormDefault="qualified">
+	<xs:annotation><xs:appinfo><jaxb:schemaBindings><jaxb:package name="test.multiplicity"/></jaxb:schemaBindings></xs:appinfo></xs:annotation>
+	<xs:element name="root" type="RootType"/>
+	<xs:complexType name="RootType">
+		<xs:sequence>
+			<xs:element name="always" type="xs:string"/>
+			<xs:choice>
+				<xs:element name="xmlData" type="xs:string"/>
+				<xs:element name="binaryData" type="xs:string"/>
+			</xs:choice>
+			<xs:sequence minOccurs="0">
+				<xs:element name="inOptionalGroup" type="xs:string"/>
+			</xs:sequence>
+			<xs:sequence maxOccurs="unbounded">
+				<xs:element name="repeatedOptional" type="xs:string" minOccurs="0"/>
+			</xs:sequence>
+			<xs:sequence maxOccurs="unbounded">
+				<xs:element name="repeatedRequired" type="xs:string"/>
+			</xs:sequence>
+			<xs:choice minOccurs="1">
+				<xs:element name="onlyBranch" type="xs:string"/>
+			</xs:choice>
+		</xs:sequence>
+		<xs:attribute name="mandatory" type="xs:string" use="required"/>
+		<xs:attribute name="optional" type="xs:string"/>
+	</xs:complexType>
+</xs:schema>

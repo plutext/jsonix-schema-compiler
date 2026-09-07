@@ -10,6 +10,7 @@ import org.hisrc.jscm.codemodel.expression.JSArrayLiteral;
 import org.hisrc.jscm.codemodel.expression.JSMemberExpression;
 import org.hisrc.jscm.codemodel.expression.JSObjectLiteral;
 import org.hisrc.jsonix.naming.Naming;
+import org.hisrc.jsonix.xml.xsom.EffectiveMultiplicity;
 import org.hisrc.jsonix.xml.xsom.ParticleMultiplicityCounter;
 import org.hisrc.xml.xsom.XSFunctionApplier;
 import org.jvnet.jaxb.xml.bind.model.MAnyAttributePropertyInfo;
@@ -51,7 +52,12 @@ public final class PropertyInfoVisitor<T, C extends T> implements MPropertyInfoV
 	private void createPropertyInfoOptions(MPropertyInfo<T, C> propertyInfo, JSObjectLiteral options) {
 		options.append(naming.name(), this.codeModel.string(propertyInfo.getPrivateName()));
 
-		final Multiplicity multiplicity = multiplicityCounter.apply(propertyInfo.getOrigin());
+		// Effective within the class's content model (choice branches and optional groups make
+		// a property optional); the particle's own occurrence when the schema is not available.
+		Multiplicity multiplicity = EffectiveMultiplicity.of(propertyInfo);
+		if (multiplicity == null) {
+			multiplicity = multiplicityCounter.apply(propertyInfo.getOrigin());
+		}
 		if (multiplicity != null) {
 			if (multiplicity.min != null && !BigInteger.ZERO.equals(multiplicity.min)) {
 				options.append(naming.required(), this.codeModel._boolean(true));
