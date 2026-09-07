@@ -3,7 +3,7 @@
 	<artifactId>jsonix-schema-compiler-test-typescript</artifactId>
 	<packaging>jar</packaging>
 	<name>Jsonix Schema Compiler Test [typescript]</name>
-	<description>Generates TypeScript declarations and an ES module for the purchase order schema, type-checks them with the @mitre/jsonix runtime typings, and unmarshals through the runtime (CR-005; jsonix-CR-001 item 6). Requires node/npm and the @mitre/jsonix runtime (see jsonix.runtime.dependency); skip with -Dskip.typescript=true.</description>
+	<description>Generates TypeScript declarations and an ES module for the purchase order schema, type-checks them with the @docx4j/jsonix runtime typings, and unmarshals through the runtime (CR-005; jsonix-CR-001 item 6). Requires node/npm and the @docx4j/jsonix runtime (see jsonix.runtime.dependency); skip with -Dskip.typescript=true.</description>
 	<parent>
 		<groupId>org.hisrc.jsonix</groupId>
 		<artifactId>jsonix-schema-compiler-tests</artifactId>
@@ -11,8 +11,9 @@
 	</parent>
 	<properties>
 		<skip.typescript>false</skip.typescript>
-		<!-- The @mitre/jsonix runtime (3.1.0+ carries generic typings, jsonix-CR-001). Until 3.1.0 is on npm this
-		     points at the sibling checkout; override with -Djsonix.runtime.dependency=^3.1.0 once published. -->
+		<!-- The @docx4j/jsonix runtime (3.2.0: generic typings, ES-module entry, parent pointers). Until 3.2.0 is on
+		     npm this points at the sibling checkout (plutext/jsonix); override with -Djsonix.runtime.dependency=^3.2.0
+		     once published, and make that the default. -->
 		<jsonix.runtime.dependency>file:../../../jsonix/nodejs/scripts</jsonix.runtime.dependency>
 	</properties>
 	<dependencies>
@@ -35,7 +36,7 @@
 				<artifactId>maven-resources-plugin</artifactId>
 				<executions>
 					<execution>
-						<!-- package.json with the @mitre/jsonix dependency resolved from ${jsonix.runtime.dependency} -->
+						<!-- package.json with the @docx4j/jsonix dependency resolved from ${jsonix.runtime.dependency} -->
 						<id>copy-package.json</id>
 						<phase>initialize</phase>
 						<goals>

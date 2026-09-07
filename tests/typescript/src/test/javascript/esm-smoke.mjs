@@ -1,10 +1,10 @@
 // Runtime check of the ES module output (CR-005, phase 2): the generated .mjs mapping
-// must be importable as an ES module next to a named import of the @mitre/jsonix runtime
+// must be importable as an ES module next to a named import of the @docx4j/jsonix runtime
 // (3.1.0+, jsonix-CR-001), and the unmarshalled object must have the shape the generated
 // declarations describe.
 import { readFileSync } from 'node:fs';
 import assert from 'node:assert/strict';
-import { Jsonix } from '@mitre/jsonix';
+import { Jsonix } from '@docx4j/jsonix';
 import { PO } from '../../../target/generated-sources/xjc/PurchaseOrder.mjs';
 
 const context = new Jsonix.Context([PO]);

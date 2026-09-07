@@ -38,11 +38,11 @@ annotations need `-Xinheritance`, `-Xannotate` or `-Xinject-code` compile by add
 From the command line:
 
 ```
-npm install jsonix-schema-compiler
-java -jar node_modules/jsonix-schema-compiler/lib/jsonix-schema-compiler-full.jar schema.xsd
+npm install @docx4j/jsonix-schema-compiler
+java -jar node_modules/@docx4j/jsonix-schema-compiler/lib/jsonix-schema-compiler-full.jar schema.xsd
 ```
 
-Or add `jsonix-schema-compiler` as dependency and invoke in `scripts/prepublish`.
+Or add `@docx4j/jsonix-schema-compiler` as dependency and invoke in `scripts/prepublish`.
 
 ```json
  {
@@ -50,12 +50,12 @@ Or add `jsonix-schema-compiler` as dependency and invoke in `scripts/prepublish`
     ...
     "dependencies": {
         ...
-        "jsonix": "<VERSION>",
-        "jsonix-schema-compiler": "<VERSION>"
+        "@docx4j/jsonix": "<VERSION>",
+        "@docx4j/jsonix-schema-compiler": "<VERSION>"
     },
     "scripts": {
     	...
-        "prepublish" : "java -jar node_modules/jsonix/lib/jsonix-schema-compiler-full.jar schema.xsd"
+        "prepublish" : "java -jar node_modules/@docx4j/jsonix-schema-compiler/lib/jsonix-schema-compiler-full.jar schema.xsd"
     }
 }
 ```
@@ -152,7 +152,7 @@ po.orderDate?.year; // number | undefined (dates are Jsonix calendars, not JS Da
   and `TYPE_NAME` is a literal union over the type and its subtypes, usable as a discriminant.
 - `readonly PARENT?: A | B` names the types that can contain the type (through their properties,
   substitution groups and subtypes). The runtime fills it in when unmarshalling with
-  `new Jsonix.Context(mappings, { parentPointers: true })` (`@mitre/jsonix` 3.2.0+, jsonix-CR-002),
+  `new Jsonix.Context(mappings, { parentPointers: true })` (`@docx4j/jsonix` 3.2.0+, jsonix-CR-002),
   and `Jsonix.Util.deepCopy(value)` copies a subtree and re-links the pointers, like docx4j's
   `-Xparent-pointer` / `-Xdocx4j-copy` model. Types that only occur at the root have no `PARENT`.
 - Cross-module references become `import type * as ... from './<other module>'`.
@@ -188,11 +188,11 @@ Two mapping-level customizations shape all outputs (mapping, JSON Schema, declar
 Attributes are otherwise emitted sorted by name (XSOM does not keep a stable order for attributes
 from several attribute groups); elements keep schema order.
 
-Generated declarations are self-contained. With the `@mitre/jsonix` runtime 3.1.0 or newer, whose
+Generated declarations are self-contained. With the `@docx4j/jsonix` runtime 3.1.0 or newer, whose
 typings are generic, no cast is needed at all:
 
 ```ts
-import { Jsonix } from '@mitre/jsonix';
+import { Jsonix } from '@docx4j/jsonix';
 import { PO } from './PurchaseOrder.mjs';
 import type { PurchaseOrderElement } from './PurchaseOrder.mjs';
 const po = new Jsonix.Context([PO]).createUnmarshaller().unmarshalString<PurchaseOrderElement>(xml).value;

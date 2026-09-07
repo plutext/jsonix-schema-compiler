@@ -22,7 +22,7 @@ Use the wrapper (`./mvnw`, pinned to Maven 3.9.16). All plugin versions are pinn
 `pluginManagement`. The `npm` module invokes `npm install` during `compile`, so `npm` must be on the
 PATH for a full build (or exclude it with `-pl '!npm'`); it also drops `lib/`, `node_modules/` and
 `package-lock.json` into `npm/`, which are not tracked. `tests/typescript` (profile `tests`) also needs
-`node`/`npm` (it runs `tsc` and a Node smoke test) and the `@mitre/jsonix` runtime 3.1.0+, which is
+`node`/`npm` (it runs `tsc` and a Node smoke test) and the `@docx4j/jsonix` runtime 3.2.0 (plutext/jsonix), which is
 not on npm yet: its `package.json` is generated from `src/main/npm/package.json` with the dependency
 taken from `-Djsonix.runtime.dependency` (default `file:../../../jsonix/nodejs/scripts`, i.e. the
 sibling `plutext/jsonix` checkout next to this repository; CI checks it out into `jsonix/`). Skip the

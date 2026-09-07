@@ -15,7 +15,7 @@ jobs:
         java: ["11", "17", "21"]
     steps:
       - uses: actions/checkout@v4
-      # The @mitre/jsonix runtime (3.1.0+, generic typings) is not on npm yet; tests/typescript
+      # The @docx4j/jsonix runtime (3.2.0) is not on npm yet; tests/typescript
       # type-checks against the sibling repository checkout (jsonix-CR-001 item 6).
       - uses: actions/checkout@v4
         with:

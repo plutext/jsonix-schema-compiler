@@ -192,7 +192,7 @@ Items 1 to 5 implemented as proposed, plus one finding that changed more than pl
   (`InvalidCustomizationException` for an unknown type or property), applied through
   `Mapping.getProperties`, which the mapping, JSON Schema and TypeScript emitters all use (decision
   1). `OfficeOpenXML/bindings.xjb` orders `CTLine` as `vmlId style from to`; a `v:line` marshalled
-  through `@mitre/jsonix` now serialises as `id style from to`.
+  through `@docx4j/jsonix` now serialises as `id style from to`.
 - **Item 2**: `jsonix:property` gained a `defaultValue` attribute and may appear directly under
   `jsonix:mapping` (`name="Type.property"`); `CreateTypeInfoDelaration` applies the override.
   `Style.customStyle` now says `defaultValue: false` in the WML mapping.

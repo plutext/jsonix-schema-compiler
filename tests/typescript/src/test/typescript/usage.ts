@@ -1,6 +1,6 @@
 // Compile-time checks of the declarations generated for purchaseorder.xsd, composed with the
-// @mitre/jsonix runtime typings (3.1.0+, jsonix-CR-001): no casts anywhere.
-import { Jsonix } from '@mitre/jsonix';
+// @docx4j/jsonix runtime typings (3.1.0+, jsonix-CR-001): no casts anywhere.
+import { Jsonix } from '@docx4j/jsonix';
 import { PO } from '../../../target/generated-sources/xjc/PurchaseOrder.std';
 import { PO as PO_ESM } from '../../../target/generated-sources/xjc/PurchaseOrder.mjs';
 import type { PurchaseOrderElement, PurchaseOrderType, RootElement, USAddress, Items, XmlCalendar } from '../../../target/generated-sources/xjc/PurchaseOrder.std';
