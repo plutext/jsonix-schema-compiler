@@ -9,7 +9,7 @@ This directory keeps the source of truth for *how* they are produced:
 
 - `bindings.xjb`: the Jsonix customizations (outputs and declarations for every module, and the
   docx4j-specific adjustments of CR-007: `v:line` attribute order, `w:customStyle` default);
-- `generate.sh`: regenerates into a `docx4j-ts` checkout (default `../docx4j-ts`) from
+- `generate.sh`: regenerates into a `docx4j-ts` checkout (default `../docx4j-ts`; into its `modules/` directory when present) from
   `../docx4j/xsd/ROOT.xsd` with `-generateTypeScript -Xinheritance -Xannotate -Xinject-code`.
 
 Regeneration is deterministic (CR-003, CR-007): with the same compiler and schemas the diff in

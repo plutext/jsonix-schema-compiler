@@ -11,6 +11,8 @@ set -eu
 ROOT_XSD="${1:-../docx4j/xsd/ROOT.xsd}"
 TARGET="${2:-../docx4j-ts}"
 [ -d "$TARGET" ] || { echo "target directory not found: $TARGET" >&2; exit 1; }
+# docx4j-ts keeps the generated modules under modules/ (bindings.xjb stays at the root).
+MODULES="$TARGET"; [ -d "$TARGET/modules" ] && MODULES="$TARGET/modules"
 JAR="$(ls full/target/jsonix-schema-compiler-full-*.jar | grep -v -- '-sources\|original-' | head -1)"
 OUT="$(mktemp -d)"
 trap 'rm -rf "$OUT"' EXIT
@@ -19,7 +21,7 @@ trap 'rm -rf "$OUT"' EXIT
 java -jar "$JAR" -d "$OUT" -generateTypeScript -Xinheritance -Xannotate -Xinject-code \
   "$ROOT_XSD" -b OfficeOpenXML/bindings.xjb
 # XJC also writes Java sources (org/...) into the target directory; keep only the mappings and declarations.
-rm -f "$TARGET"/org_*.js "$TARGET"/org_*.mjs "$TARGET"/org_*.d.ts "$TARGET"/org_*.d.mts
-cp "$OUT"/*.js "$OUT"/*.mjs "$OUT"/*.d.ts "$OUT"/*.d.mts "$TARGET"/
+rm -f "$MODULES"/org_*.js "$MODULES"/org_*.mjs "$MODULES"/org_*.d.ts "$MODULES"/org_*.d.mts
+cp "$OUT"/*.js "$OUT"/*.mjs "$OUT"/*.d.ts "$OUT"/*.d.mts "$MODULES"/
 cp OfficeOpenXML/bindings.xjb "$TARGET"/bindings.xjb
-echo "generated $(ls "$TARGET"/org_*.js | wc -l) modules into $TARGET"
+echo "generated $(ls "$MODULES"/org_*.js | wc -l) modules into $MODULES"
