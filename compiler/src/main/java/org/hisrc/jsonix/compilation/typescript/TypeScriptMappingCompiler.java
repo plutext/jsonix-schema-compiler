@@ -64,6 +64,28 @@ public class TypeScriptMappingCompiler<T, C extends T> {
 			final String localName = localName(enumLeafInfo);
 			parent(root, localName).add(compileEnumLeafInfo(enumLeafInfo, simpleName(localName)));
 		}
+		// Union aliases for the Java interfaces / superclasses that classes are
+		// customized to implement or extend (jaxb-tools inheritance plugin), CR-007.
+		final java.util.SortedMap<String, java.util.SortedSet<String>> javaTypes = new java.util.TreeMap<String, java.util.SortedSet<String>>();
+		for (MClassInfo<T, C> classInfo : mapping.getClassInfos()) {
+			for (String javaType : moduleCompiler.inheritanceTypes(classInfo)) {
+				java.util.SortedSet<String> refs = javaTypes.get(javaType);
+				if (refs == null) {
+					refs = new java.util.TreeSet<String>();
+					javaTypes.put(javaType, refs);
+				}
+				refs.add(moduleCompiler.ref(classInfo));
+				for (MClassInfo<T, C> sub : moduleCompiler.subtypesOf(classInfo)) {
+					refs.add(moduleCompiler.ref(sub));
+				}
+			}
+		}
+		for (java.util.Map.Entry<String, java.util.SortedSet<String>> entry : javaTypes.entrySet()) {
+			final String javaType = entry.getKey();
+			final String name = root.uniqueName(Ts.identifier(simpleName(javaType)));
+			root.add("/** The classes customized to implement or extend the Java type " + javaType
+					+ " (inheritance plugin). */\nexport type " + name + " = " + Ts.union(entry.getValue()) + ";");
+		}
 		final List<String> rootElements = new ArrayList<String>();
 		for (MElementInfo<T, C> elementInfo : mapping.getElementInfos()) {
 			final MClassInfo<T, C> scope = elementInfo.getScope();
@@ -125,7 +147,7 @@ public class TypeScriptMappingCompiler<T, C extends T> {
 			sb.append(TsNode.INDENT).append("readonly ").append(Ts.PARENT_PROPERTY).append("?: ").append(parentType)
 					.append(";\n");
 		}
-		for (MPropertyInfo<T, C> propertyInfo : classInfo.getProperties()) {
+		for (MPropertyInfo<T, C> propertyInfo : mapping.getProperties(classInfo)) {
 			final String propertyName = propertyInfo.getPrivateName();
 			if (Ts.TYPE_NAME_PROPERTY.equals(propertyName) || Ts.PARENT_PROPERTY.equals(propertyName)) {
 				throw new IllegalStateException("The property [" + propertyName + "] of the type ["

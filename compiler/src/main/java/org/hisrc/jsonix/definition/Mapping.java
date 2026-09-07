@@ -27,6 +27,7 @@ import org.hisrc.jsonix.analysis.PropertyInfoVertex;
 import org.hisrc.jsonix.analysis.TypeInfoVertex;
 import org.hisrc.jsonix.context.JsonixContext;
 import org.jgrapht.DirectedGraph;
+import org.jvnet.jaxb.xml.bind.model.MAttributePropertyInfo;
 import org.jvnet.jaxb.xml.bind.model.MClassInfo;
 import org.jvnet.jaxb.xml.bind.model.MElementInfo;
 import org.jvnet.jaxb.xml.bind.model.MEnumLeafInfo;
@@ -54,6 +55,10 @@ public class Mapping<T, C extends T> {
 	private final String defaultElementNamespaceURI;
 	private final String defaultAttributeNamespaceURI;
 	private final Map<InfoVertex<T, C>, ContainmentType> verticesContainmentMap = new LinkedHashMap<InfoVertex<T, C>, ContainmentType>();
+	/** Class info name → property names to emit first (jsonix:propertyOrder, CR-007). */
+	private final Map<String, List<String>> propertyOrders = new LinkedHashMap<String, List<String>>();
+	/** Property info → default value overriding the schema's (jsonix:property defaultValue, CR-007). */
+	private final Map<MPropertyInfo<T, C>, String> defaultValueOverrides = new LinkedHashMap<MPropertyInfo<T, C>, String>();
 
 	public Mapping(JsonixContext context,
 			ModelInfoGraphAnalyzer<T, C> analyzer, MPackageInfo packageInfo,
@@ -481,6 +486,89 @@ public class Mapping<T, C extends T> {
 
 	public Collection<MPropertyInfo<T, C>> getPropertyInfos() {
 		return propertyInfos;
+	}
+
+	public void setPropertyOrder(MClassInfo<T, C> classInfo, List<String> propertyNames) {
+		Validate.notNull(classInfo);
+		Validate.noNullElements(propertyNames);
+		propertyOrders.put(classInfo.getName(), new ArrayList<String>(propertyNames));
+	}
+
+	/**
+	 * The properties of the class in emission order: those named by a
+	 * {@code jsonix:propertyOrder} first, then the rest in schema order. Every
+	 * emitter (mapping, JSON Schema, TypeScript) uses this.
+	 */
+	public List<MPropertyInfo<T, C>> getProperties(MClassInfo<T, C> classInfo) {
+		Validate.notNull(classInfo);
+		final List<MPropertyInfo<T, C>> properties = sortAttributes(classInfo.getProperties());
+		final List<String> order = propertyOrders.get(classInfo.getName());
+		if (order == null || order.isEmpty()) {
+			return properties;
+		}
+		final List<MPropertyInfo<T, C>> result = new ArrayList<MPropertyInfo<T, C>>(properties.size());
+		for (String name : order) {
+			for (MPropertyInfo<T, C> propertyInfo : properties) {
+				if (name.equals(propertyInfo.getPrivateName()) && !result.contains(propertyInfo)) {
+					result.add(propertyInfo);
+				}
+			}
+		}
+		for (MPropertyInfo<T, C> propertyInfo : properties) {
+			if (!result.contains(propertyInfo)) {
+				result.add(propertyInfo);
+			}
+		}
+		return result;
+	}
+
+	/**
+	 * Element properties keep their schema (particle) order, which XSOM holds
+	 * in lists. Attribute properties are sorted by attribute name (namespace
+	 * URI, then local part) among themselves, in the slots they occupy:
+	 * XSOM keeps attribute group references in a hash set, so the order XJC
+	 * reports for attributes from several groups depends on the JVM's identity
+	 * hashes and differs between otherwise identical runs (found on docx4j's
+	 * DrawingML {@code CT_Constraint}). XML attribute order carries no meaning;
+	 * where a consumer is sensitive to it, {@code jsonix:propertyOrder} takes
+	 * precedence over this sorting.
+	 */
+	private List<MPropertyInfo<T, C>> sortAttributes(List<MPropertyInfo<T, C>> properties) {
+		final List<MAttributePropertyInfo<T, C>> attributes = new ArrayList<MAttributePropertyInfo<T, C>>();
+		for (MPropertyInfo<T, C> propertyInfo : properties) {
+			if (propertyInfo instanceof MAttributePropertyInfo) {
+				attributes.add((MAttributePropertyInfo<T, C>) propertyInfo);
+			}
+		}
+		if (attributes.size() < 2) {
+			return properties;
+		}
+		Collections.sort(attributes, new java.util.Comparator<MAttributePropertyInfo<T, C>>() {
+			@Override
+			public int compare(MAttributePropertyInfo<T, C> a, MAttributePropertyInfo<T, C> b) {
+				final javax.xml.namespace.QName an = a.getAttributeName();
+				final javax.xml.namespace.QName bn = b.getAttributeName();
+				final int byNamespace = an.getNamespaceURI().compareTo(bn.getNamespaceURI());
+				return byNamespace != 0 ? byNamespace : an.getLocalPart().compareTo(bn.getLocalPart());
+			}
+		});
+		final List<MPropertyInfo<T, C>> result = new ArrayList<MPropertyInfo<T, C>>(properties.size());
+		int next = 0;
+		for (MPropertyInfo<T, C> propertyInfo : properties) {
+			result.add(propertyInfo instanceof MAttributePropertyInfo ? attributes.get(next++) : propertyInfo);
+		}
+		return result;
+	}
+
+	public void setDefaultValueOverride(MPropertyInfo<T, C> propertyInfo, String defaultValue) {
+		Validate.notNull(propertyInfo);
+		Validate.notNull(defaultValue);
+		defaultValueOverrides.put(propertyInfo, defaultValue);
+	}
+
+	/** The overriding default value for the property, or {@code null} to use the schema's. */
+	public String getDefaultValueOverride(MPropertyInfo<T, C> propertyInfo) {
+		return defaultValueOverrides.get(propertyInfo);
 	}
 
 	/**

@@ -70,6 +70,12 @@
 			<artifactId>slf4j-simple</artifactId>
 			<scope>test</scope>
 		</dependency>
+		<!-- -Xinheritance for the inheritance-customization test (CR-007) -->
+		<dependency>
+			<groupId>org.jvnet.jaxb</groupId>
+			<artifactId>jaxb-plugins</artifactId>
+			<scope>test</scope>
+		</dependency>
 	</dependencies>
 	<!--build>
 		<plugins>

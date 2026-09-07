@@ -206,3 +206,8 @@ and `esm-smoke.mjs` already asserted only what survives (it never asserted the c
 Still to do when jsonix-CR-002 lands as 3.2.0: bump the runtime dependency of `tests/typescript`,
 confirm the smoke's runtime checks run rather than skip, and have the runtime repository regenerate
 its fixture `tests/typescript/PurchaseOrder.d.ts` from the commit that contains this compiler half.
+
+Update 2026-09-07: the runtime half landed as `@mitre/jsonix` 3.2.0 (sibling commit `dd26153`);
+`tests/typescript`'s smoke now reports "parent pointers and deepCopy behave as declared" instead of
+skipping. The dependency is still the sibling checkout (`jsonix.runtime.dependency`) until 3.2.0 is
+published to npm.

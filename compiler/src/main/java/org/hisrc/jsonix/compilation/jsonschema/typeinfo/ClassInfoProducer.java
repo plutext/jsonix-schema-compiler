@@ -58,7 +58,7 @@ public class ClassInfoProducer<T, C extends T> extends PackagedTypeInfoProducer<
 		final List<String> propertiesOrder = new ArrayList<String>(propertyInfoSchemas.size());
 		propertiesOrder.addAll(propertyInfoSchemas.keySet());
 		classInfoSchema.addProperties(propertyInfoSchemas);
-		for (MPropertyInfo<T, C> propertyInfo : classInfo.getProperties()) {
+		for (MPropertyInfo<T, C> propertyInfo : mappingCompiler.getMapping().getProperties(classInfo)) {
 			final Multiplicity multiplicity = multiplicityCounter.apply(propertyInfo.getOrigin());
 			if (multiplicity != null && multiplicity.min != null && multiplicity.min.compareTo(BigInteger.ZERO) > 0) {
 				typeInfoSchema.addRequired(propertyInfo.getPrivateName());
@@ -81,7 +81,7 @@ public class ClassInfoProducer<T, C extends T> extends PackagedTypeInfoProducer<
 	private Map<String, JsonSchemaBuilder> compilePropertyInfos(JsonSchemaMappingCompiler<T, C> mappingCompiler) {
 		final Map<String, JsonSchemaBuilder> propertyInfoSchemas = new LinkedHashMap<String, JsonSchemaBuilder>(
 				classInfo.getProperties().size());
-		for (MPropertyInfo<T, C> propertyInfo : classInfo.getProperties()) {
+		for (MPropertyInfo<T, C> propertyInfo : mappingCompiler.getMapping().getProperties(classInfo)) {
 			if (mappingCompiler.getMapping().getPropertyInfos().contains(propertyInfo)) {
 				propertyInfoSchemas.put(propertyInfo.getPrivateName(), propertyInfo
 						.acceptPropertyInfoVisitor(new JsonSchemaPropertyInfoProducerVisitor<T, C>(mappingCompiler)));

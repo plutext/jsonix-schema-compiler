@@ -70,7 +70,8 @@ public class ModulesConfigurationUnmarshaller {
 					ElementInfoConfiguration.class,
 					PropertyInfoConfiguration.class,
 					DependenciesOfMappingConfiguration.class,
-					TypeScriptConfiguration.class);
+					TypeScriptConfiguration.class,
+					PropertyOrderConfiguration.class);
 		} catch (JAXBException jaxbex) {
 			throw new ExceptionInInitializerError(jaxbex);
 		}
@@ -87,6 +88,7 @@ public class ModulesConfigurationUnmarshaller {
 					OutputConfiguration.LOCAL_ELEMENT_NAME,
 					JsonSchemaConfiguration.LOCAL_ELEMENT_NAME,
 					TypeScriptConfiguration.LOCAL_ELEMENT_NAME,
+					PropertyOrderConfiguration.LOCAL_ELEMENT_NAME,
 					IncludesConfiguration.LOCAL_ELEMENT_NAME,
 					ExcludesConfiguration.LOCAL_ELEMENT_NAME,
 					DependenciesOfMappingConfiguration.LOCAL_ELEMENT_NAME,

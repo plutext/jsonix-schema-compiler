@@ -85,3 +85,11 @@ where it previously differed. Full suite green on JDK 17 and 21 (29 + 4 unit tes
 `filter`/`wps`/`zero`/`issues`).
 
 Visible effect for users: committed mapping files reorder once on the first regeneration.
+
+## Addendum (2026-09-07, from CR-007)
+
+Property order inside a type was not covered by this CR and turned out to be JVM-dependent for
+attributes drawn from several attribute groups (XSOM keeps group references in a hash set).
+CR-007 sorts attribute properties by name in `Mapping.getProperties`; element order is a list in
+XSOM and was already stable. With that, `OfficeOpenXML/` regenerates identically across JVM
+settings.

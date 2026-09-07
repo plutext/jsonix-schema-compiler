@@ -22,6 +22,11 @@ import org.jvnet.jaxb.xml.bind.model.MClassTypeInfo;
 import org.jvnet.jaxb.xml.bind.model.MElementInfo;
 import org.jvnet.jaxb.xml.bind.model.MPackagedTypeInfo;
 import org.jvnet.jaxb.xml.bind.model.MPropertyInfo;
+import org.jvnet.jaxb.xml.bind.model.concrete.origin.CMClassInfoOrigin;
+import org.w3c.dom.Element;
+
+import com.sun.tools.xjc.model.CClassInfo;
+import com.sun.tools.xjc.model.CPluginCustomization;
 
 /**
  * Produces the TypeScript declaration file of a module ({@code <Module>.d.ts})
@@ -145,7 +150,39 @@ public class TypeScriptModuleCompiler<T, C extends T> {
 		return names;
 	}
 
-	private List<MClassInfo<T, C>> subtypesOf(MClassInfo<T, C> classInfo) {
+	/** Namespace of the jaxb-tools inheritance plugin customizations (implements / extends). */
+	public static final String INHERITANCE_NAMESPACE_URI = "urn:jaxb.jvnet.org:plugin:inheritance";
+
+	/**
+	 * The fully qualified Java types the class is customized to implement or
+	 * extend ({@code inheritance:implements}, {@code inheritance:extends}), in
+	 * document order; empty if none or if the model is not an XJC model.
+	 */
+	public List<String> inheritanceTypes(MClassInfo<T, C> classInfo) {
+		final List<String> result = new ArrayList<String>();
+		final Object origin = classInfo.getOrigin();
+		if (!(origin instanceof CMClassInfoOrigin)) {
+			return result;
+		}
+		final Object source = ((CMClassInfoOrigin<?, ?, ?>) origin).getSource();
+		if (!(source instanceof CClassInfo)) {
+			return result;
+		}
+		for (CPluginCustomization customization : ((CClassInfo) source).getCustomizations()) {
+			final Element element = customization.element;
+			if (element != null && INHERITANCE_NAMESPACE_URI.equals(element.getNamespaceURI())
+					&& ("implements".equals(element.getLocalName()) || "extends".equals(element.getLocalName()))) {
+				customization.markAsAcknowledged();
+				final String javaType = element.getTextContent() == null ? "" : element.getTextContent().trim();
+				if (!javaType.isEmpty()) {
+					result.add(javaType);
+				}
+			}
+		}
+		return result;
+	}
+
+	public List<MClassInfo<T, C>> subtypesOf(MClassInfo<T, C> classInfo) {
 		final List<MClassInfo<T, C>> result = new ArrayList<MClassInfo<T, C>>();
 		final java.util.Deque<MClassInfo<T, C>> queue = new java.util.ArrayDeque<MClassInfo<T, C>>();
 		final Set<String> visited = new HashSet<String>();

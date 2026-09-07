@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jaxb:bindings version="3.0" xmlns:jaxb="https://jakarta.ee/xml/ns/jaxb" xmlns:xs="http://www.w3.org/2001/XMLSchema"
+	xmlns:jsonix="http://jsonix.highsource.org/customizations" jaxb:extensionBindingPrefixes="jsonix">
+	<jaxb:bindings schemaLocation="schema.xsd" node="/xs:schema">
+		<jsonix:mapping name="Adjustments" package="test.adjustments">
+			<jsonix:propertyOrder typeInfo="LineType">id style</jsonix:propertyOrder>
+			<jsonix:property name="StyleType.customStyle" defaultValue="false"/>
+		</jsonix:mapping>
+		<jsonix:typeScript/>
+	</jaxb:bindings>
+</jaxb:bindings>

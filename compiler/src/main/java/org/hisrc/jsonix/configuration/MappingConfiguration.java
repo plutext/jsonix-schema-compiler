@@ -1,6 +1,8 @@
 package org.hisrc.jsonix.configuration;
 
 import java.text.MessageFormat;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 
 import jakarta.xml.bind.annotation.XmlAttribute;
@@ -14,6 +16,8 @@ import org.hisrc.jsonix.analysis.ModelInfoGraphAnalyzer;
 import org.hisrc.jsonix.configuration.exception.MissingMappingWithIdException;
 import org.hisrc.jsonix.context.JsonixContext;
 import org.hisrc.jsonix.definition.Mapping;
+import org.jvnet.jaxb.xml.bind.model.MClassInfo;
+import org.hisrc.jsonix.configuration.exception.InvalidCustomizationException;
 import org.jvnet.jaxb.xml.bind.model.MElementInfo;
 import org.jvnet.jaxb.xml.bind.model.MModelInfo;
 import org.jvnet.jaxb.xml.bind.model.MPackageInfo;
@@ -40,6 +44,8 @@ public class MappingConfiguration {
 	private String defaultAttributeNamespaceURI;
 	private IncludesConfiguration includesConfiguration;
 	private ExcludesConfiguration excludesConfiguration;
+	private List<PropertyOrderConfiguration> propertyOrderConfigurations = new LinkedList<PropertyOrderConfiguration>();
+	private List<PropertyInfoConfiguration> propertyInfoConfigurations = new LinkedList<PropertyInfoConfiguration>();
 
 	public static final QName MAPPING_NAME = new QName(
 			ModulesConfiguration.NAMESPACE_URI,
@@ -118,6 +124,25 @@ public class MappingConfiguration {
 	public void setIncludesConfiguration(
 			IncludesConfiguration includesConfiguration) {
 		this.includesConfiguration = includesConfiguration;
+	}
+
+	@XmlElement(name = PropertyOrderConfiguration.LOCAL_ELEMENT_NAME)
+	public List<PropertyOrderConfiguration> getPropertyOrderConfigurations() {
+		return propertyOrderConfigurations;
+	}
+
+	public void setPropertyOrderConfigurations(List<PropertyOrderConfiguration> propertyOrderConfigurations) {
+		this.propertyOrderConfigurations = propertyOrderConfigurations;
+	}
+
+	/** {@code jsonix:property} elements directly under the mapping: per-property overrides such as {@code defaultValue}. */
+	@XmlElement(name = PropertyInfoConfiguration.LOCAL_ELEMENT_NAME)
+	public List<PropertyInfoConfiguration> getPropertyInfoConfigurations() {
+		return propertyInfoConfigurations;
+	}
+
+	public void setPropertyInfoConfigurations(List<PropertyInfoConfiguration> propertyInfoConfigurations) {
+		this.propertyInfoConfigurations = propertyInfoConfigurations;
 	}
 
 	@XmlElement(name = ExcludesConfiguration.LOCAL_ELEMENT_NAME)
@@ -272,8 +297,56 @@ public class MappingConfiguration {
 			}
 		}
 
+		applyPropertyOrders(analyzer, packageInfo, mapping);
+		applyPropertyOverrides(analyzer, packageInfo, mapping);
+
 		return mapping;
 
+	}
+
+	private <T, C extends T> void applyPropertyOrders(ModelInfoGraphAnalyzer<T, C> analyzer,
+			MPackageInfo packageInfo, Mapping<T, C> mapping) {
+		for (PropertyOrderConfiguration configuration : getPropertyOrderConfigurations()) {
+			final String typeName = configuration.getTypeInfo();
+			if (typeName == null) {
+				throw new InvalidCustomizationException(MessageFormat.format(
+						"The [{0}] element in the mapping [{1}] requires the [typeInfo] attribute.",
+						PropertyOrderConfiguration.LOCAL_ELEMENT_NAME, getName()));
+			}
+			final MTypeInfo<T, C> typeInfo = analyzer.findTypeInfoByName(packageInfo, typeName);
+			if (!(typeInfo instanceof MClassInfo)) {
+				throw new InvalidCustomizationException(MessageFormat.format(
+						"The [{0}] element refers to the type [{1}], which is not a class in the package [{2}].",
+						PropertyOrderConfiguration.LOCAL_ELEMENT_NAME, typeName, packageInfo.getPackageName()));
+			}
+			final MClassInfo<T, C> classInfo = (MClassInfo<T, C>) typeInfo;
+			final List<String> names = configuration.getPropertyNames();
+			for (String name : names) {
+				if (classInfo.getProperty(name) == null) {
+					throw new InvalidCustomizationException(MessageFormat.format(
+							"The [{0}] element for the type [{1}] names the property [{2}], which the type does not have.",
+							PropertyOrderConfiguration.LOCAL_ELEMENT_NAME, typeName, name));
+				}
+			}
+			mapping.setPropertyOrder(classInfo, names);
+		}
+	}
+
+	private <T, C extends T> void applyPropertyOverrides(ModelInfoGraphAnalyzer<T, C> analyzer,
+			MPackageInfo packageInfo, Mapping<T, C> mapping) {
+		for (PropertyInfoConfiguration configuration : getPropertyInfoConfigurations()) {
+			final String name = configuration.getName();
+			final MPropertyInfo<T, C> propertyInfo = name == null ? null
+					: analyzer.findPropertyInfoByName(packageInfo, name);
+			if (propertyInfo == null) {
+				throw new InvalidCustomizationException(MessageFormat.format(
+						"The [{0}] element in the mapping [{1}] refers to the property [{2}], which was not found in the package [{3}] (expected <type>.<property>).",
+						PropertyInfoConfiguration.LOCAL_ELEMENT_NAME, getName(), name, packageInfo.getPackageName()));
+			}
+			if (configuration.getDefaultValue() != null) {
+				mapping.setDefaultValueOverride(propertyInfo, configuration.getDefaultValue());
+			}
+		}
 	}
 
 	@Override

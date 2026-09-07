@@ -52,6 +52,7 @@ public class PluginCustomizations {
 					OutputConfiguration.LOCAL_ELEMENT_NAME,
 					JsonSchemaConfiguration.LOCAL_ELEMENT_NAME,
 					TypeScriptConfiguration.LOCAL_ELEMENT_NAME,
+					PropertyOrderConfiguration.LOCAL_ELEMENT_NAME,
 					IncludesConfiguration.LOCAL_ELEMENT_NAME,
 					ExcludesConfiguration.LOCAL_ELEMENT_NAME,
 					DependenciesOfMappingConfiguration.LOCAL_ELEMENT_NAME,

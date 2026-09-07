@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- CR-007: property order, default value override and inheritance customizations. -->
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
+	xmlns:jaxb="https://jakarta.ee/xml/ns/jaxb" jaxb:version="3.0"
+	xmlns:inheritance="urn:jaxb.jvnet.org:plugin:inheritance"
+	jaxb:extensionBindingPrefixes="inheritance"
+	targetNamespace="urn:test:adjustments" xmlns="urn:test:adjustments" elementFormDefault="qualified">
+	<xs:annotation>
+		<xs:appinfo>
+			<jaxb:schemaBindings>
+				<jaxb:package name="test.adjustments"/>
+			</jaxb:schemaBindings>
+		</xs:appinfo>
+	</xs:annotation>
+	<xs:element name="line" type="LineType"/>
+	<xs:complexType name="LineType">
+		<xs:annotation>
+			<xs:appinfo>
+				<inheritance:implements>test.hand.written.Shape</inheritance:implements>
+			</xs:appinfo>
+		</xs:annotation>
+		<xs:attribute name="from" type="xs:string"/>
+		<xs:attribute name="to" type="xs:string"/>
+		<xs:attribute name="id" type="xs:string"/>
+		<xs:attribute name="style" type="xs:string"/>
+	</xs:complexType>
+	<xs:complexType name="StyleType">
+		<xs:annotation>
+			<xs:appinfo>
+				<inheritance:implements>test.hand.written.Shape</inheritance:implements>
+				<inheritance:extends>test.hand.written.Base</inheritance:extends>
+			</xs:appinfo>
+		</xs:annotation>
+		<xs:attribute name="customStyle" type="xs:boolean" default="true"/>
+	</xs:complexType>
+	<xs:complexType name="OtherType">
+		<xs:sequence>
+			<xs:element name="zElement" type="xs:string" minOccurs="0"/>
+			<xs:element name="aElement" type="xs:string" minOccurs="0"/>
+		</xs:sequence>
+		<xs:attribute name="z" type="xs:string"/>
+		<xs:attribute name="a" type="xs:string"/>
+	</xs:complexType>
+</xs:schema>

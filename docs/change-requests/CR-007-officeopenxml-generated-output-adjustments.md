@@ -1,6 +1,6 @@
 # CR-007: Equivalents of docx4j's `ModifyGeneratedSources` for the OfficeOpenXML output
 
-**Status:** Accepted 2026-09-07 (decisions below); in progress
+**Status:** Implemented 2026-09-07
 **Depends on:** CR-005 (TypeScript output), CR-006 (`PARENT`; runtime half jsonix-CR-002 for the helper part)
 **Recommended order:** after the runtime half of CR-006 lands; items 1 and 3 can go first
 
@@ -170,3 +170,43 @@ Kept deliberately tiny; anything larger belongs in a consumer library, not next 
 2. Interface aliases use the Java interface's simple name (`ContentAccessor`), with a numeric
    suffix on collision.
 3. The helper module is shipped as `OfficeOpenXML/helpers/wml.ts`.
+
+## Implementation notes (2026-09-07)
+
+Items 1 to 5 implemented as proposed, plus one finding that changed more than planned:
+
+- **Attribute order was never deterministic.** While regenerating `OfficeOpenXML/` after adding
+  the customizations, two unrelated modules changed: in DrawingML's `CT_Constraint` one attribute
+  group swapped places with another. XSOM keeps attribute-group references in a plain `Set`
+  (`AttributesHolder.attGroups`), so the order XJC reports for attributes drawn from several groups
+  follows identity hashes; `java -Xshare:off` alone flips it. CR-003's byte-identical regenerations
+  had been luck of identical allocation. `Mapping.getProperties(classInfo)` therefore now sorts
+  attribute properties by attribute name (namespace URI, then local part) among themselves, in the
+  slots they occupy; element properties keep their particle order, which XSOM holds in lists;
+  `jsonix:propertyOrder` still takes precedence. Verified: `OfficeOpenXML/` is now identical under
+  `-Xshare:off`, `-XX:+UseSerialGC` and `-Xint`. The one-time reorder touched 147 of its files.
+  XML attribute order carries no meaning, and the previous order could not be relied on, so no
+  compatibility note beyond this one.
+- **Item 1**: `configuration.PropertyOrderConfiguration` (`jsonix:propertyOrder typeInfo="..."`
+  with whitespace-separated property names), validated against the model
+  (`InvalidCustomizationException` for an unknown type or property), applied through
+  `Mapping.getProperties`, which the mapping, JSON Schema and TypeScript emitters all use (decision
+  1). `OfficeOpenXML/bindings.xjb` orders `CTLine` as `vmlId style from to`; a `v:line` marshalled
+  through `@mitre/jsonix` now serialises as `id style from to`.
+- **Item 2**: `jsonix:property` gained a `defaultValue` attribute and may appear directly under
+  `jsonix:mapping` (`name="Type.property"`); `CreateTypeInfoDelaration` applies the override.
+  `Style.customStyle` now says `defaultValue: false` in the WML mapping.
+- **Item 3**: `TypeScriptModuleCompiler.inheritanceTypes` reads `inheritance:implements` and
+  `inheritance:extends` from the class's XJC customizations (marking them acknowledged) and
+  `TypeScriptMappingCompiler` emits one union alias per Java type, simple name (decision 2), over the
+  implementing classes and their subtypes. WML gains `ContentAccessor` (17 members), `SdtElement`,
+  `SdtContent`, `CTCustomXmlElement`; VML gains `VmlShapeElements`, `VmlAllCoreAttributes`,
+  `VmlAllShapeAttributes`. `compiler` has `jaxb-plugins` as a test dependency so the test can run
+  with `-Xinheritance`.
+- **Item 5**: `OfficeOpenXML/helpers/wml.ts` (decision 3) with `HIGHLIGHT_COLORS`,
+  `highlightHexValue`, `highlightNameForColor`, `isQFormat` (uses `PARENT`) and `isCustomStyle`,
+  type-checked with the rest of the directory.
+- Tests: `JsonixPluginAdjustmentsTest` (order in mapping, JSON Schema and declarations; attribute
+  sorting; default override; `Shape`/`Base` aliases from `implements`/`extends`). Full suite green
+  on JDK 17. The runtime checks in `tests/typescript`'s smoke now run rather than skip, because the
+  sibling checkout has implemented jsonix-CR-002 in the meantime.

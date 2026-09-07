@@ -156,6 +156,8 @@ po.orderDate?.year; // number | undefined (dates are Jsonix calendars, not JS Da
   and `Jsonix.Util.deepCopy(value)` copies a subtree and re-links the pointers, like docx4j's
   `-Xparent-pointer` / `-Xdocx4j-copy` model. Types that only occur at the root have no `PARENT`.
 - Cross-module references become `import type * as ... from './<other module>'`.
+- Java interfaces declared with the jaxb-tools inheritance plugin (`inheritance:implements`,
+  `inheritance:extends`) become union aliases, e.g. `export type ContentAccessor = Body | P | ...`.
 - Customise the file name with `<jsonix:typeScript fileName="${module.name}.d.ts"/>` inside
   `jsonix:module` (or at the top level of the bindings). One file per module; naming
   (standard/compact) does not affect it.
@@ -173,6 +175,18 @@ To emit the mapping itself as an ES module instead of the UMD wrapper (for bundl
 import { PO } from './PurchaseOrder.mjs';
 const context = new Jsonix.Context([PO]);
 ```
+
+Two mapping-level customizations shape all outputs (mapping, JSON Schema, declarations):
+
+```xml
+<jsonix:mapping package="org.docx4j.vml">
+  <jsonix:propertyOrder typeInfo="CTLine">vmlId style from to</jsonix:propertyOrder> <!-- these first, rest in schema order -->
+  <jsonix:property name="Style.customStyle" defaultValue="false"/>                   <!-- override the schema default -->
+</jsonix:mapping>
+```
+
+Attributes are otherwise emitted sorted by name (XSOM does not keep a stable order for attributes
+from several attribute groups); elements keep schema order.
 
 Generated declarations are self-contained. With the `@mitre/jsonix` runtime 3.1.0 or newer, whose
 typings are generic, no cast is needed at all:

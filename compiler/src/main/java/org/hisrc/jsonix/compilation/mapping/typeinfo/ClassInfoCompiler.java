@@ -75,7 +75,7 @@ public class ClassInfoCompiler<T, C extends T> extends PackagedTypeInfoCompiler<
 		final JSCodeModel codeModel = mappingCompiler.getCodeModel();
 		final Mapping<T, C> mapping = mappingCompiler.getMapping();
 		final JSArrayLiteral propertyInfoMappings = codeModel.array();
-		for (MPropertyInfo<T, C> propertyInfo : classInfo.getProperties()) {
+		for (MPropertyInfo<T, C> propertyInfo : mapping.getProperties(classInfo)) {
 			if (mapping.getPropertyInfos().contains(propertyInfo)) {
 				propertyInfoMappings
 						.append(propertyInfo.acceptPropertyInfoVisitor(new PropertyInfoVisitor<T, C>(mappingCompiler)));

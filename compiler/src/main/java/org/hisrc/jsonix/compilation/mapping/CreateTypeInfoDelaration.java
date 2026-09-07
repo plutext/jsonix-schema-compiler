@@ -13,6 +13,7 @@ import org.hisrc.xml.xsom.SchemaComponentAware;
 import org.jvnet.jaxb.xml.bind.model.MBuiltinLeafInfo;
 import org.jvnet.jaxb.xml.bind.model.MDefaultValue;
 import org.jvnet.jaxb.xml.bind.model.MEnumLeafInfo;
+import org.jvnet.jaxb.xml.bind.model.MPropertyInfo;
 import org.jvnet.jaxb.xml.bind.model.MTypeInfo;
 import org.jvnet.jaxb.xml.bind.model.origin.MOriginated;
 import org.jvnet.jaxb.xml.bind.model.util.DefaultTypeInfoVisitor;
@@ -96,6 +97,14 @@ public final class CreateTypeInfoDelaration<T, C extends T, M extends MOriginate
 			MDefaultValue defaultValue = (MDefaultValue) info;
 
 			String defaultValueString = defaultValue.getDefaultValue();
+			if (info instanceof MPropertyInfo) {
+				@SuppressWarnings("unchecked")
+				final String override = mappingCompiler.getMapping()
+						.getDefaultValueOverride((MPropertyInfo<T, C>) info);
+				if (override != null) {
+					defaultValueString = override;
+				}
+			}
 			final NamespaceContext defaultValueNamespaceContext = defaultValue.getDefaultValueNamespaceContext();
 			if (defaultValueString != null) {
 				final XmlString defaultValueXmlString;

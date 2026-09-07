@@ -20,6 +20,7 @@ public class PropertyInfoConfiguration {
 	public static final String LOCAL_ELEMENT_NAME = "property";
 
 	private String name;
+	private String defaultValue;
 
 	@XmlAttribute
 	public String getName() {
@@ -28,6 +29,20 @@ public class PropertyInfoConfiguration {
 
 	public void setName(String name) {
 		this.name = name;
+	}
+
+	/**
+	 * Overrides the schema's default value in the generated mapping
+	 * ({@code defaultValue: ...}); usable when the element is placed directly
+	 * under {@code jsonix:mapping} (CR-007).
+	 */
+	@XmlAttribute(name = "defaultValue")
+	public String getDefaultValue() {
+		return defaultValue;
+	}
+
+	public void setDefaultValue(String defaultValue) {
+		this.defaultValue = defaultValue;
 	}
 
 	public <T, C extends T> MPropertyInfo<T, C> findPropertyInfo(
