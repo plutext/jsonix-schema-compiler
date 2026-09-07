@@ -155,3 +155,8 @@ Split and repository setup: two hours. Facade, `exports`, tests, CI: one day.
   generated files now live in `docx4j-ts` as `npm run typecheck` / `npm test`.
 - Decisions taken as recommended: package name `@docx4j/docx4j-ts`; no per-module packages;
   `parentPointers` on by default in the facade.
+
+Layout change (2026-09-07, `b0dceee` in docx4j-ts): only package files at the root; generated
+modules and the reference `bindings.xjb` under `modules/`, the facade and helper sources under
+`src/` compiled to `dist/`, tests under `test/`. Public paths are unchanged (`exports`: root facade,
+`./helpers/wml`, `./modules/*`). `generate.sh` writes into `modules/`.
