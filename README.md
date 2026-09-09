@@ -32,7 +32,7 @@ See [Command-Line Usage](https://github.com/highsource/jsonix-schema-compiler/wi
 Other XJC plugin switches are passed through; the jar bundles the jaxb-tools plugins, so schemas whose
 annotations need `-Xinheritance`, `-Xannotate` or `-Xinject-code` compile by adding those switches.
 The Office Open XML mappings and declarations generated this way from docx4j's schemas are published as
-[`@docx4j/docx4j-ts`](https://github.com/plutext/docx4j-ts); `OfficeOpenXML/` holds their bindings and generation script.
+[`@docx4j/generated-objects-ts`](https://github.com/plutext/docx4j-generated-objects-ts); `OfficeOpenXML/` holds their bindings and generation script.
 
 ## Using with NPM
 

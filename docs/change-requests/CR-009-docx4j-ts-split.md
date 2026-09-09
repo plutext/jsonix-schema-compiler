@@ -160,3 +160,37 @@ Layout change (2026-09-07, `b0dceee` in docx4j-ts): only package files at the ro
 modules and the reference `bindings.xjb` under `modules/`, the facade and helper sources under
 `src/` compiled to `dist/`, tests under `test/`. Public paths are unchanged (`exports`: root facade,
 `./helpers/wml`, `./modules/*`). `generate.sh` writes into `modules/`.
+
+## Rename (2026-09-09): `plutext/docx4j-generated-objects-ts`, `@docx4j/generated-objects-ts`
+
+The names above (`plutext/docx4j-ts`, `@docx4j/docx4j-ts`) were used from 2026-09-07 until
+2026-09-09 and appear in the history of both repositories; nothing was published to npm under them.
+
+Decision: a TypeScript engine layer (OPC packaging over zip and flat OPC, typed parts and
+relationships, style/numbering/font resolution, the counterpart of `docx4j-core`) will be built in
+a **separate** sibling repository, not as an npm workspace next to the generated modules, because
+the 6 MB of generated modules change rarely and an engine release must not require a model
+release. The engine is what consumers install (as `docx4j-core` pulls in the generated objects in
+Java): repository `plutext/docx4j-core-ts`, package **`@docx4j/core-ts`**, mirroring `docx4j-core`.
+One repository per package, named `docx4j-<x>-ts` for package `@docx4j/<x>-ts`; a later OpenDoPE
+engine port would be `docx4j-opendope-ts` on the same pattern.
+The generated objects mirror docx4j's current module name `docx4j-generated-objects`
+(VERSION_17_1_1): repository **`plutext/docx4j-generated-objects-ts`**, package
+**`@docx4j/generated-objects-ts`**, local checkout `../docx4j-generated-objects-ts`. Package names
+follow the npm convention that the scope carries the brand and is not repeated (`@babel/core`):
+Java `docx4j-<x>` becomes `@docx4j/<x>-ts`, the `-ts` suffix marking the port. "docx4j-ts" is the
+name of the TypeScript line as a whole, not of a package or repository (`plutext/docx4j-ts` is free
+for a README-only landing page if one is ever wanted).
+
+The objects package remains usable on its own (Office JS add-ins, custom XML parts), keeps the
+facade as its public API and the add-in README; the engine depends on it by version (`file:` until
+published) and re-exports the facade. Tree-only helpers (`isQFormat`, `unmarshalPackage`) stay in
+the objects package; anything needing parts or relationships belongs in the engine.
+
+Done 2026-09-09: GitHub repository renamed from the account; local checkout renamed and remote
+updated; in the objects repository `package.json` (name, repository, homepage, bugs), README,
+CLAUDE.md, NOTICE, `generate.md`, `src/index.mts`, `test/smoke.mjs` and its fixture updated (the
+smoke loads mappings by package self-reference, so it verifies the new name); `npm run typecheck`
+and `npm test` pass. Here: `OfficeOpenXML/generate.sh` default target, `OfficeOpenXML/README.md`,
+README, CLAUDE.md and the change-request index. Section 6.2 / 10 of the strategy document
+(`js_product_strategy_decisions_202609.md`) carry a dated note with the same names (`@docx4j/docx4j-ts` is retired as a package name).

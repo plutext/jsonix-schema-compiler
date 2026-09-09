@@ -14,7 +14,7 @@ whose last upstream commit is from November 2018).
 | [CR-006](CR-006-parent-pointers-and-deep-copy.md) | Parent pointers and deep copy for unmarshalled objects (docx4j `-Xparent-pointer` / `-Xdocx4j-copy` parity; runtime half is jsonix-CR-002) | 5 | Compiler half implemented 2026-09-07; runtime half pending (jsonix-CR-002) |
 | [CR-007](CR-007-officeopenxml-generated-output-adjustments.md) | Equivalents of docx4j's `ModifyGeneratedSources` for the OfficeOpenXML output (`jsonix:propertyOrder`, `defaultValue` override, `inheritance:implements` unions, helper module) | 6 | Implemented 2026-09-07 |
 | [CR-008](CR-008-docx4j-identity.md) | Publish under the docx4j identity: `@docx4j/jsonix-schema-compiler` (done), `org.docx4j.jsonix` (planned) | 7 | Draft; npm rename applied |
-| [CR-009](CR-009-docx4j-ts-split.md) | Split `OfficeOpenXML/` into `plutext/docx4j-ts` as `@docx4j/docx4j-ts` with a docx4j-style facade | 8 | Implemented 2026-09-07 (push to GitHub pending) |
+| [CR-009](CR-009-docx4j-ts-split.md) | Split `OfficeOpenXML/` into its own repository with a docx4j-style facade; renamed 2026-09-09 to `plutext/docx4j-generated-objects-ts` / `@docx4j/generated-objects-ts` | 8 | Implemented 2026-09-07, pushed; renamed 2026-09-09 |
 
 All findings below were reproduced on 2026-09-06 on this machine (Maven 3.9.16, OpenJDK 8u502,
 17 and 21) against commit `a160ac7`. Trial migrations were done in scratch copies; nothing in the
