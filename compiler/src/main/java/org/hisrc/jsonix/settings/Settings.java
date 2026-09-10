@@ -68,4 +68,16 @@ public class Settings {
 		generateTypeScript = value;
 	}
 
+	private boolean generateFactories = false;
+
+	/** CR-010: element factories next to the TypeScript declarations (implies TypeScript output). */
+	public boolean isGenerateFactories() {
+		return generateFactories;
+	}
+
+	@Option(name = "-generateFactories", aliases = { "-Xjsonix-generateFactories" })
+	public void setGenerateFactories(boolean value) {
+		generateFactories = value;
+	}
+
 }

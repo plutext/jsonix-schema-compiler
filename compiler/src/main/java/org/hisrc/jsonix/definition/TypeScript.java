@@ -11,10 +11,24 @@ public class TypeScript {
 
 	private final String directory = "";
 	private final String fileName;
+	private final boolean factories;
 
 	public TypeScript(final String fileName) {
+		this(fileName, false);
+	}
+
+	public TypeScript(final String fileName, final boolean factories) {
 		Validate.notNull(fileName);
 		this.fileName = fileName;
+		this.factories = factories;
+	}
+
+	/**
+	 * Whether element factories ({@code <base>.factory.mjs}, {@code <base>.el.mjs}
+	 * and their declarations, CR-010) are generated next to the declarations.
+	 */
+	public boolean isFactories() {
+		return factories;
 	}
 
 	public String getDirectory() {

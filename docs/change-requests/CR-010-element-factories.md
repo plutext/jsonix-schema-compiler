@@ -1,6 +1,6 @@
 # CR-010: Generated element factories (docx4j's `ObjectFactory` for the TypeScript model)
 
-**Status:** Accepted 2026-09-10 (review fixes folded in; see section 8), implementation in progress
+**Status:** Implemented 2026-09-10 (review fixes in section 8, implementation notes in section 9)
 **Depends on:** CR-005 (TypeScript output; the `.d.mts` / `.mjs` emitter this extends), CR-007
 (the OfficeOpenXML adjustments; the factories read the same model), CR-009 (the objects
 repository that ships the output)
@@ -215,3 +215,44 @@ Review findings folded into the sections above:
 6. A creator's partial `init` loses the compile-time required-property check; the objects
    README says a literal remains the stricter form (section 4). Open questions 1 to 4 are
    decided as recommended.
+
+## 9. Implementation notes (2026-09-10)
+
+- `compilation.typescript.FactoryCompiler`, invoked from `TypeScriptModuleCompiler.compile()` when
+  the module's `TypeScript` definition has `factories` set: `-generateFactories` /
+  `-Xjsonix-generateFactories` (`Settings`; implies the TypeScript output and also switches
+  `factories` on for `jsonix:typeScript` customizations from the bindings) or
+  `<jsonix:typeScript factories="true"/>` (`TypeScriptConfiguration`). Four files per module:
+  `<base>.factory.mjs`, `<base>.factory.d.mts`, `<base>.el.mjs`, `<base>.el.d.mts`, through the
+  existing `TextFileWriter`.
+- **Names come from XJC itself.** A scoped or global wrapper is `create` + the element's XJC
+  *squeezed name* (`CElementInfo.getSqueezedName()`, reached through the element info's
+  `CMElementInfoOrigin`), which is what XJC's `ObjectFactory` uses: for a scoped element it
+  already starts with the scope class (`RT` for `w:t` in `R`), and it carries `jaxb:class`
+  customizations on element refs, which is how docx4j distinguishes `w:rPr` and `m:rPr` in
+  `CTMathRunTrackChange` (`createCTMathRunTrackChangeRPr` and `createCTMathRunTrackChangeRPrMath`).
+  Section 3's `createBodyP` does not exist: `w:p` has only its global declaration (`P` is a root
+  element in docx4j), so its wrapper is `createPElement`, as is `createRElement` for `w:r`; `el.p`
+  and `el.r` are the compact forms. Global wrappers take the `Element` suffix (section 8 item 1).
+  A scoped wrapper whose XJC name a creator already holds (a nested class named after the element
+  in the same scope: `SdtPr.Alias` and `w:alias` in `SdtPr`, which Java overloads) takes the
+  `Element` suffix too: `createSdtPrAlias(init?)` creates, `createSdtPrAliasElement(value)`
+  wraps. Any other collision fails the build naming both sources.
+- Creators are emitted for non-abstract classes only (`CClassInfo.isAbstract()`), as JAXB's
+  `ObjectFactory`. `init` is `Partial<Omit<T, 'TYPE_NAME' | 'PARENT'>>`.
+- The factory `.d.mts` imports the module's declarations as `import type * as M` plus the six
+  support types by name (`XmlQName`, ...); `TypeScriptModuleCompiler.setOwnQualifier("M.")` makes
+  `ref()` qualify the module's own types while the factory is compiled, so `CreateTsTypeVisitor`
+  is reused unchanged and cross-module types keep their `Dep_<module>` aliases.
+- `el` covers the element declarations in the mapping's `defaultElementNamespaceURI` only. In WML
+  that is 170 of 200 local names: the 30 others are math (`m:r`, `m:t`, ...) and Word 2010
+  (`w14:glow`, `w14:ligatures`, ...) declarations scoped in WML classes, reached through their
+  scoped wrappers or the owning module's `el`. A reserved-word name is exported with `as`
+  (`el.object` in WML). One QName with several types (`sdt`, `customXml`) is union-typed and sets
+  no `TYPE_NAME`.
+- Tests: `FactoryOutputTest` (golden files `compiler/src/test/resources/typescript/po/PurchaseOrder.{factory,el}.{mjs,d.mts}`;
+  naming rules on the `zero` schema), `tests/typescript` (`factories.ts` type-checks the three ways
+  of building a purchase order and the `@ts-expect-error` cases; `esm-smoke.mjs` marshals them to
+  identical XML and checks `TYPE_NAME` behaviour). `OfficeOpenXML/generate.sh` passes the option;
+  the objects repository gained 376 files (3.1 MB, 94 modules × 4; WML: 1,282 factory exports,
+  170 `el` exports), `./factory/*` and `./el/*` export entries, smoke checks and a README section.

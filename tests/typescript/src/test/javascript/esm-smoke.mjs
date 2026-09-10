@@ -43,3 +43,25 @@ if (typeof Jsonix.Util.deepCopy === 'function') {
 } else {
   console.log('esm-smoke: runtime has no Jsonix.Util.deepCopy yet (jsonix-CR-002); parent pointer checks skipped');
 }
+
+// CR-010: element factories. The same purchase order built three ways marshals to the same XML.
+{
+  const { createPurchaseOrderType, createUSAddress, createItems, createItemsItem, createPurchaseOrderElement } = await import('../../../target/generated-sources/xjc/PurchaseOrder.factory.mjs');
+  const el = await import('../../../target/generated-sources/xjc/PurchaseOrder.el.mjs');
+  const marshaller = context.createMarshaller();
+  const address = () => ({ name: 'Alice Smith', street: '123 Maple Street', city: 'Mill Valley', state: 'CA', zip: 90952 });
+  const value = () => ({ shipTo: address(), billTo: address(), items: { item: [{ productName: 'Lawnmower', partNum: '872-AA', quantity: 1, usPrice: 148.95 }] }, orderDate: { year: 1999, month: 10, day: 20 } });
+  const viaCreators = createPurchaseOrderElement(createPurchaseOrderType({ shipTo: createUSAddress(address()), billTo: address(), items: createItems({ item: [createItemsItem({ productName: 'Lawnmower', partNum: '872-AA', quantity: 1, usPrice: 148.95 })] }), orderDate: { year: 1999, month: 10, day: 20 } }));
+  const viaEl = el.purchaseOrder(value());
+  const viaLiteral = { name: { namespaceURI: '', localPart: 'purchaseOrder' }, value: value() };
+  const expected = marshaller.marshalString(viaLiteral);
+  assert.equal(marshaller.marshalString(viaCreators), expected);
+  assert.equal(marshaller.marshalString(viaEl), expected);
+  assert.equal(viaCreators.value.TYPE_NAME, 'PO.PurchaseOrderType', 'a creator sets TYPE_NAME');
+  assert.equal(viaCreators.value.shipTo.TYPE_NAME, 'PO.USAddress');
+  assert.equal(viaEl.value.TYPE_NAME, 'PO.PurchaseOrderType', 'a wrapper sets TYPE_NAME on a literal value');
+  const tagged = createPurchaseOrderElement({ TYPE_NAME: 'PO.PurchaseOrderType', ...value() });
+  assert.equal(tagged.value.TYPE_NAME, 'PO.PurchaseOrderType', 'a wrapper leaves an existing TYPE_NAME alone');
+  assert.deepEqual(createUSAddress(), { TYPE_NAME: 'PO.USAddress' });
+  console.log('esm-smoke: element factories (CR-010) build the same document as a literal');
+}

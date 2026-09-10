@@ -201,3 +201,11 @@ const po = new Jsonix.Context([PO]).createUnmarshaller().unmarshalString<Purchas
 
 `JsonixMapping<RootElement>` carries the mapping's root element union as a phantom type parameter
 (`__rootElement`), so a runtime can infer the result type from the mappings passed to `Jsonix.Context`.
+
+Add `-generateFactories` (`-Xjsonix-generateFactories`) to also get, next to the declarations, element
+factories in the manner of JAXB's `ObjectFactory` (CR-010): `<module>.factory.mjs` with a creator
+per class (`createP(init?)`, `TYPE_NAME` set) and a wrapper per element declaration
+(`createRT(value)` for `w:t` in a run, `createSettingsElement(value)` for a global element), and
+`<module>.el.mjs` with one wrapper per element name of the module's namespace (`import * as el`,
+then `el.p(...)`). Each has a `.d.mts`. The option implies `-generateTypeScript`; in bindings use
+`<jsonix:typeScript factories="true"/>`.

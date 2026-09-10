@@ -59,6 +59,12 @@ public class TypeScriptModuleCompiler<T, C extends T> {
 	private final Map<String, List<MClassInfo<T, C>>> subclasses = new LinkedHashMap<String, List<MClassInfo<T, C>>>();
 	/** TYPE_NAME of a class → the classes with a property that can hold it (CR-006). */
 	private final Map<String, Set<MClassInfo<T, C>>> containers = new LinkedHashMap<String, Set<MClassInfo<T, C>>>();
+	/**
+	 * Prefix put before references to this module's own types; empty inside
+	 * the declarations, {@code M.} inside the factory declarations, which
+	 * import the module's declarations as a namespace (CR-010).
+	 */
+	private String ownQualifier = "";
 
 	public TypeScriptModuleCompiler(Modules<T, C> modules, Module<T, C> module, TypeScript typeScript) {
 		this.modules = Validate.notNull(modules);
@@ -182,6 +188,16 @@ public class TypeScriptModuleCompiler<T, C extends T> {
 		return result;
 	}
 
+	/** Whether the class is abstract in the schema (XJC model), for which no creator is generated (CR-010). */
+	public boolean isAbstract(MClassInfo<T, C> classInfo) {
+		final Object origin = classInfo.getOrigin();
+		if (!(origin instanceof CMClassInfoOrigin)) {
+			return false;
+		}
+		final Object source = ((CMClassInfoOrigin<?, ?, ?>) origin).getSource();
+		return source instanceof CClassInfo && ((CClassInfo) source).isAbstract();
+	}
+
 	public List<MClassInfo<T, C>> subtypesOf(MClassInfo<T, C> classInfo) {
 		final List<MClassInfo<T, C>> result = new ArrayList<MClassInfo<T, C>>();
 		final java.util.Deque<MClassInfo<T, C>> queue = new java.util.ArrayDeque<MClassInfo<T, C>>();
@@ -247,6 +263,9 @@ public class TypeScriptModuleCompiler<T, C extends T> {
 		final List<GeneratedFile> files = new ArrayList<GeneratedFile>();
 		files.add(new GeneratedFile(typeScript.getFileName(), compileDeclarations()));
 		final String moduleBaseName = typeScript.getBaseName();
+		if (typeScript.isFactories()) {
+			files.addAll(new FactoryCompiler<T, C>(this, typeScript).compile());
+		}
 		final Set<String> done = new HashSet<String>();
 		for (Output output : module.getOutputs()) {
 			final String outputFileName = output.getFileName();
@@ -354,6 +373,21 @@ public class TypeScriptModuleCompiler<T, C extends T> {
 		return (mappingName == null ? "" : mappingName + ".") + localName;
 	}
 
+	/** Whether the type belongs to a mapping, i.e. whether Jsonix tags its instances with a TYPE_NAME. */
+	public boolean isMapped(MPackagedTypeInfo<T, C> typeInfo) {
+		return modules.getMappingName(typeInfo.getPackageInfo().getPackageName()) != null;
+	}
+
+	/** The dependency modules referenced so far and their import aliases, in first-use order. */
+	public Map<Module<T, C>, String> getImports() {
+		return imports;
+	}
+
+	/** See {@link #ownQualifier}. */
+	public void setOwnQualifier(String ownQualifier) {
+		this.ownQualifier = ownQualifier == null ? "" : ownQualifier;
+	}
+
 	/**
 	 * A TypeScript reference to the declaration of the given type, qualified
 	 * with the mapping namespace and/or an import alias as needed.
@@ -375,6 +409,8 @@ public class TypeScriptModuleCompiler<T, C extends T> {
 				return Ts.ANY;
 			}
 			sb.append(importAlias(targetModule)).append('.');
+		} else {
+			sb.append(ownQualifier);
 		}
 		if (hasMultipleMappings(targetModule)) {
 			sb.append(mappingName).append('.');

@@ -14,6 +14,9 @@
     "target/generated-sources/xjc/PurchaseOrder.std.d.ts",
     "target/generated-sources/xjc/PurchaseOrder.cmp.d.ts",
     "target/generated-sources/xjc/PurchaseOrder.d.mts",
-    "src/test/typescript/usage.ts"
+    "target/generated-sources/xjc/PurchaseOrder.factory.d.mts",
+    "target/generated-sources/xjc/PurchaseOrder.el.d.mts",
+    "src/test/typescript/usage.ts",
+    "src/test/typescript/factories.ts"
   ]
 }

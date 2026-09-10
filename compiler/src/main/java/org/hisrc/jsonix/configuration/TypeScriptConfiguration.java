@@ -11,7 +11,8 @@ import org.hisrc.jsonix.definition.TypeScript;
 
 /**
  * Configuration of the TypeScript declarations output of a module
- * ({@code <jsonix:typeScript fileName="${module.name}.d.ts"/>}).
+ * ({@code <jsonix:typeScript fileName="${module.name}.d.ts" factories="true"/>}).
+ * {@code factories} (CR-010) adds the element factories next to the declarations.
  */
 @XmlRootElement(name = TypeScriptConfiguration.LOCAL_ELEMENT_NAME)
 @XmlType(propOrder = {})
@@ -35,6 +36,22 @@ public class TypeScriptConfiguration {
 		this.fileName = fileName;
 	}
 
+	public TypeScriptConfiguration(String fileName, boolean factories) {
+		this(fileName);
+		this.factories = factories;
+	}
+
+	private boolean factories = false;
+
+	@XmlAttribute(name = "factories")
+	public boolean isFactories() {
+		return factories;
+	}
+
+	public void setFactories(boolean factories) {
+		this.factories = factories;
+	}
+
 	@XmlAttribute(name = "fileName")
 	public String getFileName() {
 		return fileName;
@@ -49,6 +66,6 @@ public class TypeScriptConfiguration {
 		Validate.notNull(moduleName);
 		final String fileName = getFileName().replace(
 				ModuleConfiguration.MODULE_NAME_PROPERTY, moduleName);
-		return new TypeScript(fileName);
+		return new TypeScript(fileName, factories);
 	}
 }

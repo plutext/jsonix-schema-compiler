@@ -58,14 +58,27 @@ public class JsonixInvoker {
 				.isGenerateJsonSchema() ? new JsonSchemaConfiguration(
 				JsonSchemaConfiguration.STANDARD_FILE_NAME_PATTERN) : null;
 
+		// -generateFactories implies the TypeScript output its declarations import (CR-010).
 		final TypeScriptConfiguration defaultTypeScriptConfiguration = settings
-				.isGenerateTypeScript() ? new TypeScriptConfiguration(
-				TypeScriptConfiguration.STANDARD_FILE_NAME_PATTERN) : null;
+				.isGenerateTypeScript() || settings.isGenerateFactories() ? new TypeScriptConfiguration(
+				TypeScriptConfiguration.STANDARD_FILE_NAME_PATTERN, settings.isGenerateFactories()) : null;
 
 		final ModulesConfiguration modulesConfiguration = customizationHandler
 				.unmarshal(model, defaultOutputConfiguration,
 						defaultJsonSchemaConfiguration,
 						defaultTypeScriptConfiguration);
+		if (settings.isGenerateFactories()) {
+			// The option applies to jsonix:typeScript customizations from the bindings as well.
+			for (TypeScriptConfiguration configuration : modulesConfiguration.getTypeScriptConfigurations()) {
+				configuration.setFactories(true);
+			}
+			for (org.hisrc.jsonix.configuration.ModuleConfiguration moduleConfiguration : modulesConfiguration
+					.getModuleConfigurations()) {
+				for (TypeScriptConfiguration configuration : moduleConfiguration.getTypeScriptConfigurations()) {
+					configuration.setFactories(true);
+				}
+			}
+		}
 
 		final MModelInfo<NType, NClass> modelinfo = new XJCCMInfoFactory(model)
 				.createModel();

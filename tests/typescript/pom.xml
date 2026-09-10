@@ -3,7 +3,7 @@
 	<artifactId>jsonix-schema-compiler-test-typescript</artifactId>
 	<packaging>jar</packaging>
 	<name>Jsonix Schema Compiler Test [typescript]</name>
-	<description>Generates TypeScript declarations and an ES module for the purchase order schema, type-checks them with the @docx4j/jsonix runtime typings, and unmarshals through the runtime (CR-005; jsonix-CR-001 item 6). Requires node/npm and the @docx4j/jsonix runtime (see jsonix.runtime.dependency); skip with -Dskip.typescript=true.</description>
+	<description>Generates TypeScript declarations, an ES module and element factories for the purchase order schema, type-checks them with the @docx4j/jsonix runtime typings, and unmarshals and marshals through the runtime (CR-005, CR-010; jsonix-CR-001 item 6). Requires node/npm and the @docx4j/jsonix runtime (see jsonix.runtime.dependency); skip with -Dskip.typescript=true.</description>
 	<parent>
 		<groupId>org.hisrc.jsonix</groupId>
 		<artifactId>jsonix-schema-compiler-tests</artifactId>
@@ -64,6 +64,7 @@
 					<args>
 						<arg>-Xjsonix</arg>
 						<arg>-Xjsonix-generateTypeScript</arg>
+						<arg>-Xjsonix-generateFactories</arg>
 					</args>
 					<plugins>
 						<plugin>

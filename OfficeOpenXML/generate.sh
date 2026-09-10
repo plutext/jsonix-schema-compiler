@@ -18,10 +18,10 @@ OUT="$(mktemp -d)"
 trap 'rm -rf "$OUT"' EXIT
 # -Xinheritance/-Xannotate/-Xinject-code: docx4j's schemas carry customizations for those XJC
 # plugins (they shape the generated Java, not the XML model); XJC refuses them unless enabled.
-java -jar "$JAR" -d "$OUT" -generateTypeScript -Xinheritance -Xannotate -Xinject-code \
+java -jar "$JAR" -d "$OUT" -generateTypeScript -generateFactories -Xinheritance -Xannotate -Xinject-code \
   "$ROOT_XSD" -b OfficeOpenXML/bindings.xjb
 # XJC also writes Java sources (org/...) into the target directory; keep only the mappings and declarations.
 rm -f "$MODULES"/org_*.js "$MODULES"/org_*.mjs "$MODULES"/org_*.d.ts "$MODULES"/org_*.d.mts
-cp "$OUT"/*.js "$OUT"/*.mjs "$OUT"/*.d.ts "$OUT"/*.d.mts "$MODULES"/
+cp "$OUT"/*.js "$OUT"/*.mjs "$OUT"/*.d.ts "$OUT"/*.d.mts "$MODULES"/   # includes <Module>.factory.* and <Module>.el.* (CR-010)
 cp OfficeOpenXML/bindings.xjb "$MODULES"/bindings.xjb
 echo "generated $(ls "$MODULES"/org_*.js | wc -l) modules into $MODULES"
