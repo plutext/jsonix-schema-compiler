@@ -14,12 +14,12 @@ jobs:
         # CR-002: JDK 11+ toolchain, Java 11 bytecode.
         java: ["11", "17", "21"]
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       # tests/typescript installs the @docx4j/jsonix runtime (^3.2.0) from npm.
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v6
         with:
-          node-version: "20"
-      - uses: actions/setup-java@v4
+          node-version: "22"
+      - uses: actions/setup-java@v5
         with:
           distribution: temurin
           java-version: ${{ matrix.java }}
