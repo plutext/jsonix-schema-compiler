@@ -22,11 +22,10 @@ Use the wrapper (`./mvnw`, pinned to Maven 3.9.16). All plugin versions are pinn
 `pluginManagement`. The `npm` module invokes `npm install` during `compile`, so `npm` must be on the
 PATH for a full build (or exclude it with `-pl '!npm'`); it also drops `lib/`, `node_modules/` and
 `package-lock.json` into `npm/`, which are not tracked. `tests/typescript` (profile `tests`) also needs
-`node`/`npm` (it runs `tsc` and a Node smoke test) and the `@docx4j/jsonix` runtime 3.2.0 (plutext/jsonix), which is
-not on npm yet: its `package.json` is generated from `src/main/npm/package.json` with the dependency
-taken from `-Djsonix.runtime.dependency` (default `file:../../../jsonix/nodejs/scripts`, i.e. the
-sibling `plutext/jsonix` checkout next to this repository; CI checks it out into `jsonix/`). Skip the
-module with `-Dskip.typescript=true`.
+`node`/`npm` (it runs `tsc` and a Node smoke test) and the `@docx4j/jsonix` runtime 3.2.0 (plutext/jsonix): its
+`package.json` is generated from `src/main/npm/package.json` with the dependency taken from
+`-Djsonix.runtime.dependency` (default `^3.2.0` from npm; `file:../../../jsonix/nodejs/scripts` tests against
+the sibling `plutext/jsonix` checkout next to this repository). Skip the module with `-Dskip.typescript=true`.
 
 Generated output order is deterministic (CR-003): `definition.Mapping` returns class/enum infos sorted
 by scoped local name and element infos by (namespace, local part, scope) via `InfoComparators`, so
@@ -48,7 +47,7 @@ generated files can be diffed across toolchains. `DeterministicOrderTest` guards
 # Unit + integration tests (tests/ module is behind the `tests` profile). This is what CI runs.
 ./mvnw clean install -Ptests -pl '!npm'
 
-# One integration module only (resolves org.hisrc.jsonix:jsonix-schema-compiler from ~/.m2,
+# One integration module only (resolves org.docx4j.jsonix:jsonix-schema-compiler from ~/.m2,
 # so the root pom and compiler must have been installed first)
 ./mvnw -Ptests -pl tests/issues test
 
@@ -105,4 +104,4 @@ Practical consequences:
 
 ## Versioning and release
 
-See `RELEASING.md`. The version string appears in every module pom and in `npm/src/main/npm/package.json`; bump with `./mvnw versions:set -Pall -DnewVersion=...`. The `release` profile attaches javadoc and GPG signatures. This fork cannot publish to the upstream `org.hisrc.jsonix` coordinates or npm package name; no `distributionManagement` is configured.
+See `RELEASING.md`. The version lives in every module pom (currently 3.0.0; 2.3.9 is upstream's last `javax` release); `npm/package.json` gets it by resource filtering from `npm/src/main/npm/package.json`. Bump with `./mvnw versions:set -Pall -DnewVersion=...`. Coordinates are `org.docx4j.jsonix` (Maven) and `@docx4j/jsonix-schema-compiler` (npm, `publishConfig.access` public); Java packages and the customization namespace keep `org.hisrc.jsonix` / `jsonix.highsource.org`. Only npm is published; Maven Central is deferred (CR-008), so there is no `distributionManagement` and `mvn deploy` is only run on the `npm` module.

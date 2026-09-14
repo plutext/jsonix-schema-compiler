@@ -4,9 +4,9 @@
 	<packaging>pom</packaging>
 	<name>Jsonix Samples</name>
 	<parent>
-		<groupId>org.hisrc.jsonix</groupId>
+		<groupId>org.docx4j.jsonix</groupId>
 		<artifactId>jsonix-schema-compiler-project</artifactId>
-		<version>2.3.10-SNAPSHOT</version>
+		<version>3.0.0</version>
 	</parent>
 	<modules>
 		<module>po</module>
@@ -23,7 +23,7 @@
 						<!--phase>package</phase-->
 						<phase>none</phase>
 						<goals>
-							 <goal>attached</goal>
+							 <goal>single</goal>
 						</goals>
 						<configuration>
 							<descriptors>
@@ -36,7 +36,7 @@
 						<!--phase>package</phase-->
 						<phase>none</phase>
 						<goals>
-							 <goal>attached</goal>
+							 <goal>single</goal>
 						</goals>
 						<configuration>
 							<descriptors>
@@ -49,7 +49,7 @@
 						<!--phase>package</phase-->
 						<phase>none</phase>
 						<goals>
-							 <goal>attached</goal>
+							 <goal>single</goal>
 						</goals>
 						<configuration>
 							<descriptors>
@@ -62,7 +62,7 @@
 						<!--phase>package</phase-->
 						<phase>none</phase>
 						<goals>
-							 <goal>attached</goal>
+							 <goal>single</goal>
 						</goals>
 						<configuration>
 							<descriptors>

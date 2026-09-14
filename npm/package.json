@@ -1,6 +1,6 @@
 {
 	"name" : "@docx4j/jsonix-schema-compiler",
-	"version" : "2.3.10-SNAPSHOT",
+	"version" : "3.0.0",
 	"description" : "Jsonix Schema Compiler generates Jsonix mappings from XML Schemas",
 	"keywords" : [
 			"json", "xml", "unmarshal", "unmarshalling", "marshal",
@@ -18,10 +18,7 @@
 		"type": "git",
 		"url": "git+https://github.com/plutext/jsonix-schema-compiler.git"
 	},
-	"licenses" : [ {
-		"type" : "BSD-3-Clause",
-		"url" : "https://github.com/plutext/jsonix-schema-compiler/raw/master/LICENSE"
-	} ],
+	"license" : "BSD-3-Clause",
 	"author" : {
 		"name" : "Alexey Valikov",
 		"url" : "http://github.com/highsource"
@@ -31,8 +28,7 @@
 		"url" : "https://github.com/deoxxa"
 	} ],
 	"main" : "jsonix-schema-compiler.js",
-	"repository" : {
-		"type" : "git",
-		"url" : "git+https://github.com/plutext/jsonix-schema-compiler.git"
+	"publishConfig" : {
+		"access" : "public"
 	}
 }

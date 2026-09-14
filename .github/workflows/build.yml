@@ -15,12 +15,7 @@ jobs:
         java: ["11", "17", "21"]
     steps:
       - uses: actions/checkout@v4
-      # The @docx4j/jsonix runtime (3.2.0) is not on npm yet; tests/typescript
-      # type-checks against the sibling repository checkout (jsonix-CR-001 item 6).
-      - uses: actions/checkout@v4
-        with:
-          repository: plutext/jsonix
-          path: jsonix
+      # tests/typescript installs the @docx4j/jsonix runtime (^3.2.0) from npm.
       - uses: actions/setup-node@v4
         with:
           node-version: "20"
@@ -30,7 +25,7 @@ jobs:
           java-version: ${{ matrix.java }}
           cache: maven
       - name: Build and run unit + integration tests (npm module excluded)
-        run: ./mvnw -B -ntp clean install -Ptests -pl '!npm' -Djsonix.runtime.dependency=file:../../jsonix/nodejs/scripts
+        run: ./mvnw -B -ntp clean install -Ptests -pl '!npm'
       - name: Smoke-test the CLI jar against the purchase-order sample
         run: |
           mkdir -p target/smoke

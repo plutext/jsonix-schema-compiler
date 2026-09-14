@@ -19,7 +19,7 @@ Please refer to [Wiki](https://github.com/highsource/jsonix-schema-compiler/wiki
 
 ## Using in command-line
 
-Download `jsonix-schema-compiler-full-<VERSION>.jar` from [releases](https://github.com/highsource/jsonix-schema-compiler/releases) and run it with `java -jar` from the command line:
+Download `jsonix-schema-compiler-full-<VERSION>.jar` from [releases](https://github.com/plutext/jsonix-schema-compiler/releases) (or take `lib/jsonix-schema-compiler-full.jar` from the npm package below) and run it with `java -jar` from the command line:
 
 ```
 java -jar jsonix-schema-compiler-full-<VERSION>.jar
@@ -90,6 +90,9 @@ See [Ant Usage](https://github.com/highsource/jsonix-schema-compiler/wiki/Ant-Us
 
 ## Using with Maven
 
+The 3.x artifacts are not published to a Maven repository yet; install them locally from a checkout
+(`./mvnw install -pl '!npm'`) to use the plugin this way.
+
 ```xml
 <plugin>
 	<groupId>org.jvnet.jaxb</groupId>
@@ -103,7 +106,7 @@ See [Ant Usage](https://github.com/highsource/jsonix-schema-compiler/wiki/Ant-Us
 		</args>
 		<plugins>
 			<plugin>
-				<groupId>org.hisrc.jsonix</groupId>
+				<groupId>org.docx4j.jsonix</groupId>
 				<artifactId>jsonix-schema-compiler</artifactId>
 				<version>${jsonix-schema-compiler.version}</version>
 			</plugin>

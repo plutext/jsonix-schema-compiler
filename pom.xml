@@ -1,14 +1,14 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 	<modelVersion>4.0.0</modelVersion>
-	<groupId>org.hisrc.jsonix</groupId>
+	<groupId>org.docx4j.jsonix</groupId>
 	<artifactId>jsonix-schema-compiler-project</artifactId>
 	<packaging>pom</packaging>
-	<version>2.3.10-SNAPSHOT</version>
+	<version>3.0.0</version>
 	<name>Jsonix Schema Compiler Project</name>
-	<url>https://github.com/highsource/jsonix-schema-compiler</url>
+	<url>https://github.com/plutext/jsonix-schema-compiler</url>
 	<issueManagement>
 		<system>GitHub Issues</system>
-		<url>https://github.com/highsource/jsonix-schema-compiler/issues</url>
+		<url>https://github.com/plutext/jsonix-schema-compiler/issues</url>
 	</issueManagement>
 	<inceptionYear>2010</inceptionYear>
 	<developers>
@@ -16,6 +16,11 @@
 			<id>highsource</id>
 			<name>Alexey Valikov</name>
 			<email>valikov@gmx.net</email>
+		</developer>
+		<developer>
+			<id>plutext</id>
+			<name>Jason Harrop</name>
+			<organization>Plutext</organization>
 		</developer>
 	</developers>
 	<contributors>
@@ -34,9 +39,9 @@
 		</license>
 	</licenses>
 	<scm>
-		<connection>scm:git:git@github.com:highsource/jsonix-schema-compiler.git</connection>
-		<developerConnection>scm:git:git@github.com:highsource/jsonix-schema-compiler.git</developerConnection>
-		<url>https://github.com/highsource/jsonix-schema-compiler</url>
+		<connection>scm:git:git@github.com:plutext/jsonix-schema-compiler.git</connection>
+		<developerConnection>scm:git:git@github.com:plutext/jsonix-schema-compiler.git</developerConnection>
+		<url>https://github.com/plutext/jsonix-schema-compiler</url>
 	</scm>
 	<organization>
 		<name>Highsource</name>
@@ -158,17 +163,17 @@
 	<dependencyManagement>
 		<dependencies>
 			<dependency>
-				<groupId>org.hisrc.jsonix</groupId>
+				<groupId>org.docx4j.jsonix</groupId>
 				<artifactId>jsonix-schema-compiler</artifactId>
 				<version>${project.version}</version>
 			</dependency>
 			<dependency>
-				<groupId>org.hisrc.jsonix</groupId>
+				<groupId>org.docx4j.jsonix</groupId>
 				<artifactId>jsonix-schema-compiler-full</artifactId>
 				<version>${project.version}</version>
 			</dependency>
 			<dependency>
-				<groupId>org.hisrc.jsonix</groupId>
+				<groupId>org.docx4j.jsonix</groupId>
 				<artifactId>jsonix-schema-compiler-plugin</artifactId>
 				<version>${project.version}</version>
 			</dependency>

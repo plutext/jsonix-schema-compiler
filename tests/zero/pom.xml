@@ -4,9 +4,9 @@
 	<packaging>jar</packaging>
 	<name>Jsonix Schema Compiler Test [zero]</name>
 	<parent>
-		<groupId>org.hisrc.jsonix</groupId>
+		<groupId>org.docx4j.jsonix</groupId>
 		<artifactId>jsonix-schema-compiler-tests</artifactId>
-		<version>2.3.10-SNAPSHOT</version>
+		<version>3.0.0</version>
 	</parent>
 	<dependencies>
 		<dependency>
@@ -29,7 +29,7 @@
 			<scope>test</scope>
 		</dependency>
 		<dependency>
-			<groupId>org.hisrc.jsonix</groupId>
+			<groupId>org.docx4j.jsonix</groupId>
 			<artifactId>jsonix-schema-compiler</artifactId>
 		</dependency>
 	</dependencies>
@@ -78,7 +78,7 @@
 					</args>
 					<plugins>
 						<plugin>
-							<groupId>org.hisrc.jsonix</groupId>
+							<groupId>org.docx4j.jsonix</groupId>
 							<artifactId>jsonix-schema-compiler</artifactId>
 							<version>${project.version}</version>
 						</plugin>

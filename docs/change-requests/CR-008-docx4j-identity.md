@@ -1,6 +1,7 @@
 # CR-008: Publish under the docx4j identity (`org.docx4j.jsonix`, `@docx4j/jsonix-schema-compiler`)
 
-**Status:** Draft (2026-09-07); npm rename applied, Maven group change planned
+**Status:** Implemented (2026-09-14) at version 3.0.0: npm rename and Maven group change done; Maven
+Central publishing deferred (see "Implementation, 2026-09-14")
 **Depends on:** CR-001 (release profile, `RELEASING.md`)
 **Context:** the runtime is now `@docx4j/jsonix` (repository `plutext/jsonix`, 3.2.0, commit `8be7123`;
 `@mitre/jsonix` 3.0.11 is the last MITRE release). The whole family moves under `docx4j`.
@@ -57,6 +58,31 @@ Steps, one commit, done as the first act of a release:
 
 Artifact ids stay (`jsonix-schema-compiler`, `-full`, `-plugin`), so the jar names in the README and
 in `OfficeOpenXML/generate.sh` do not change.
+
+## Implementation, 2026-09-14
+
+- Steps 1, 3, 4 and 5 as planned: every `<groupId>` and the `samples` assembly includes use
+  `org.docx4j.jsonix`; version 3.0.0 (decision: straight to 3.0.0, no release candidate; a problem
+  found after publishing ships as 3.0.1).
+- Step 2 in part: `<url>`, `<scm>`, `<issueManagement>` point at `plutext/jsonix-schema-compiler` and
+  the fork's maintainer is listed in `<developers>`. **No `<distributionManagement>`**: nothing needs
+  the artifacts from a Maven repository yet (the TypeScript consumers take the compiler from npm, and
+  `OfficeOpenXML/generate.sh` and `tests/*` use the local build), so Maven Central is deferred until an
+  outside XJC-plugin user asks. `RELEASING.md` publishes with `./mvnw -pl npm deploy` instead of a
+  reactor `deploy`, which would fail without a repository.
+- `npm/src/main/npm/package.json`: `"publishConfig": {"access": "public"}` (a scoped package is
+  otherwise published restricted), SPDX `license` instead of the deprecated `licenses` array, and the
+  duplicated `repository` key removed.
+- `@docx4j/jsonix` 3.2.0 is on npm: `tests/typescript` defaults `jsonix.runtime.dependency` to
+  `^3.2.0` and CI no longer checks out `plutext/jsonix`.
+- `jsonix-scripts` (upstream's `org.hisrc.jsonix:jsonix-scripts:2.2.1` on Maven Central, used by
+  `tests/filter`, `wps`, `zero`) keeps upstream's group: it is an external artifact, not ours.
+- Verification: `./mvnw clean install -Ptests` (every published module and all integration tests),
+  `npm pack --dry-run` in `npm/` gives `docx4j-jsonix-schema-compiler-3.0.0.tgz` with the full jar.
+  Step 6's `-Pall` does not pass, for reasons unrelated to this CR: `samples` used the
+  `maven-assembly-plugin` goal `attached` (removed in 3.x; now `single`), and the Ant sample then fails
+  because `project-build.xml` still names JAXB 2 jars on the `XJCTask` classpath and compiles with
+  `source="1.6"`. Follow-up: repair or retire `samples/` and `dist/`.
 
 ## Out of scope
 

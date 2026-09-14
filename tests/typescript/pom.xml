@@ -5,16 +5,15 @@
 	<name>Jsonix Schema Compiler Test [typescript]</name>
 	<description>Generates TypeScript declarations, an ES module and element factories for the purchase order schema, type-checks them with the @docx4j/jsonix runtime typings, and unmarshals and marshals through the runtime (CR-005, CR-010; jsonix-CR-001 item 6). Requires node/npm and the @docx4j/jsonix runtime (see jsonix.runtime.dependency); skip with -Dskip.typescript=true.</description>
 	<parent>
-		<groupId>org.hisrc.jsonix</groupId>
+		<groupId>org.docx4j.jsonix</groupId>
 		<artifactId>jsonix-schema-compiler-tests</artifactId>
-		<version>2.3.10-SNAPSHOT</version>
+		<version>3.0.0</version>
 	</parent>
 	<properties>
 		<skip.typescript>false</skip.typescript>
-		<!-- The @docx4j/jsonix runtime (3.2.0: generic typings, ES-module entry, parent pointers). Until 3.2.0 is on
-		     npm this points at the sibling checkout (plutext/jsonix); override with -Djsonix.runtime.dependency=^3.2.0
-		     once published, and make that the default. -->
-		<jsonix.runtime.dependency>file:../../../jsonix/nodejs/scripts</jsonix.runtime.dependency>
+		<!-- The @docx4j/jsonix runtime (3.2.0: generic typings, ES-module entry, parent pointers), from npm. To test
+		     against the sibling checkout (plutext/jsonix) use -Djsonix.runtime.dependency=file:../../../jsonix/nodejs/scripts. -->
+		<jsonix.runtime.dependency>^3.2.0</jsonix.runtime.dependency>
 	</properties>
 	<dependencies>
 		<dependency>
@@ -26,7 +25,7 @@
 			<artifactId>jaxb-runtime</artifactId>
 		</dependency>
 		<dependency>
-			<groupId>org.hisrc.jsonix</groupId>
+			<groupId>org.docx4j.jsonix</groupId>
 			<artifactId>jsonix-schema-compiler</artifactId>
 		</dependency>
 	</dependencies>
@@ -68,7 +67,7 @@
 					</args>
 					<plugins>
 						<plugin>
-							<groupId>org.hisrc.jsonix</groupId>
+							<groupId>org.docx4j.jsonix</groupId>
 							<artifactId>jsonix-schema-compiler</artifactId>
 							<version>${project.version}</version>
 						</plugin>
