@@ -1,0 +1,68 @@
+name: Publish @docx4j/jsonix-schema-compiler to NPM
+
+# Mirrors plutext/jsonix's push-to-npm.yml (trusted publishing, no token). Differences: the jar in npm/lib
+# is built by Maven (with the tests), the release tag must match the built version, and the full jar is
+# attached to the release. See RELEASING.md.
+
+on:
+  release:
+    types: [published]
+
+permissions:
+  id-token: write # required for trusted publishing's use of OIDC
+  contents: write # gh release upload of the full jar
+
+jobs:
+  build-deploy:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v5
+
+      - name: setup java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 17
+          cache: maven
+
+      - name: setup node
+        uses: actions/setup-node@v6
+        with:
+          node-version: 22
+          registry-url: 'https://registry.npmjs.org'
+
+      - name: Manually update npm to 11.5.1 or later which is the required version for trusted publishing to work # this step can be removed after the ubuntu runner has the correct minimum version of npm installed
+        run: npm install -g npm@latest
+
+      # Builds compiler, full jar and npm/ (lib/jsonix-schema-compiler-full.jar, package.json filtered from the pom
+      # version) and runs the unit and integration tests, tests/typescript included.
+      - name: Build and test
+        run: ./mvnw -B -ntp clean install -Ptests
+
+      - name: Check release tag matches the built version
+        id: version
+        env:
+          TAG: ${{ github.event.release.tag_name }}
+        run: |
+          VERSION="$(node -p "require('./npm/package.json').version")"
+          echo "tag: $TAG, version: $VERSION"
+          case "$VERSION" in *-SNAPSHOT) echo "::error::refusing to publish snapshot version $VERSION"; exit 1;; esac
+          if [ "${TAG#v}" != "$VERSION" ]; then
+            echo "::error::release tag $TAG does not match version $VERSION"
+            exit 1
+          fi
+          echo "version=$VERSION" >> "$GITHUB_OUTPUT"
+
+      - name: Package Items
+        working-directory: ./npm
+        run: npm pack
+
+      - name: Publish to npm
+        working-directory: ./npm
+        run: npm publish --access public docx4j-jsonix-schema-compiler-${{ steps.version.outputs.version }}.tgz
+
+      - name: Attach full jar to the release
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TAG: ${{ github.event.release.tag_name }}
+        run: gh release upload "$TAG" "full/target/jsonix-schema-compiler-full-${{ steps.version.outputs.version }}.jar" --clobber

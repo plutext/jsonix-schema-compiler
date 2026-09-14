@@ -68,8 +68,10 @@ in `OfficeOpenXML/generate.sh` do not change.
   the fork's maintainer is listed in `<developers>`. **No `<distributionManagement>`**: nothing needs
   the artifacts from a Maven repository yet (the TypeScript consumers take the compiler from npm, and
   `OfficeOpenXML/generate.sh` and `tests/*` use the local build), so Maven Central is deferred until an
-  outside XJC-plugin user asks. `RELEASING.md` publishes with `./mvnw -pl npm deploy` instead of a
-  reactor `deploy`, which would fail without a repository.
+  outside XJC-plugin user asks. 3.0.0 was published with a local `npm publish` from `npm/`; later
+  releases are published by `.github/workflows/push-to-npm.yml` on a GitHub release (npm trusted
+  publishing, as in `plutext/jsonix`), which also checks the tag against the version and attaches the
+  full jar. A reactor `mvn deploy` would fail without a repository.
 - `npm/src/main/npm/package.json`: `"publishConfig": {"access": "public"}` (a scoped package is
   otherwise published restricted), SPDX `license` instead of the deprecated `licenses` array, and the
   duplicated `repository` key removed.
