@@ -29,7 +29,9 @@ jobs:
       - name: Smoke-test the CLI jar against the purchase-order sample
         run: |
           mkdir -p target/smoke
-          java -jar full/target/jsonix-schema-compiler-full-*.jar \
+          # The glob also matches the -sources jar, which sorts first in the runner's C locale.
+          JAR="$(ls full/target/jsonix-schema-compiler-full-*.jar | grep -v -- '-sources')"
+          java -jar "$JAR" \
             -d target/smoke -generateJsonSchema -generateTypeScript \
             samples/po/src/main/resources/purchaseorder.xsd \
             -b samples/po/src/main/resources/bindings.xjb
